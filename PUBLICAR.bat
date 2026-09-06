@@ -57,7 +57,7 @@ echo ===========================================
 echo.
 echo Los cambios estan subidos.
 echo En 1 o 2 minutos se ven en:
-echo    https://zyon64.github.io/DannyQueen/
+echo    https://zyon64.github.io/DanielaDavila-Portfolio/
 echo.
 pause
 exit /b

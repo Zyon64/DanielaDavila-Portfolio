@@ -40,7 +40,7 @@ echo.
 gh release upload media "%SRC%" --clobber
 if errorlevel 1 goto ERROR
 
-set "URL=https://github.com/Zyon64/DannyQueen/releases/download/media/%NAME%"
+set "URL=https://github.com/Zyon64/DanielaDavila-Portfolio/releases/download/media/%NAME%"
 echo %URL%|clip
 
 echo.

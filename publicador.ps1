@@ -28,7 +28,7 @@ Register-EngineEvent PowerShell.Exiting -Action {
     Remove-Item $CERROJO -Force -EA SilentlyContinue
 } | Out-Null
 
-$REPO    = 'Zyon64/DannyQueen'
+$REPO    = 'Zyon64/DanielaDavila-Portfolio'
 $TAG     = 'media'
 $BANDEJA = Join-Path $PSScriptRoot 'subir'
 $ESTADO  = Join-Path $BANDEJA '_estado.txt'
