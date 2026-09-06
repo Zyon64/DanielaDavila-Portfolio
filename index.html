@@ -7,6 +7,7 @@
 
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F6F1E7">
+<meta name="description" content="Daniela Dávila — diseñadora gráfica y creadora de contenido digital. Branding, social media, video e inteligencia artificial.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,53 +53,111 @@
   .wrap{max-width:1120px;margin:0 auto;padding:0 32px;position:relative;z-index:1}
   @media (max-width:600px){ .wrap{padding:0 20px} }
 
-  /* ---------- Barra superior ---------- */
+  /* ---------- Barra superior: marca izquierda, links derecha ---------- */
   .topbar{
     position:fixed;top:0;left:0;right:0;z-index:100;
-    display:flex;justify-content:center;align-items:center;gap:4px;
-    padding:16px;
-    background:rgba(246,241,231,.82);
+    padding:20px 0;
+    background:rgba(246,241,231,.86);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
     border-bottom:1px solid var(--border);
   }
-  .topbar a,.topbar .copiar{
-    font-family:var(--sans);font-size:.82rem;font-weight:400;
-    color:var(--muted);text-decoration:none;
-    border:none;background:none;
-    padding:8px 16px;border-radius:2px;display:inline-block;
-    cursor:pointer;line-height:1.5;letter-spacing:.01em;
-    transition:color .25s;
+  .barra{display:flex;align-items:center;justify-content:space-between;gap:24px}
+
+  .marca{text-decoration:none;display:block;line-height:1.1}
+  .marca-n{
+    display:block;font-family:var(--serif);font-weight:400;
+    font-size:1.02rem;color:var(--text);letter-spacing:-.01em;
   }
-  .topbar a:hover,.topbar .copiar:hover{color:var(--accent)}
-  .topbar .copiar.ok{color:var(--accent)}
-  @media (max-width:560px){
-    .topbar{gap:0;padding:11px 8px;flex-wrap:wrap}
-    .topbar a,.topbar .copiar{padding:6px 10px;font-size:.76rem}
+  .marca-s{
+    display:block;font-size:.58rem;color:var(--accent);
+    letter-spacing:.26em;text-transform:uppercase;font-weight:500;margin-top:3px;
   }
 
-  /* ---------- Hero ---------- */
-  header{padding:170px 0 110px}
+  .links{display:flex;align-items:center;gap:4px}
+  .links a,.topbar .copiar{
+    font-family:var(--sans);font-size:.78rem;font-weight:400;
+    color:var(--muted);text-decoration:none;
+    border:none;background:none;
+    padding:8px 14px;cursor:pointer;line-height:1.5;
+    letter-spacing:.06em;text-transform:uppercase;
+    transition:color .25s;
+  }
+  .links a:hover,.topbar .copiar:hover{color:var(--accent)}
+  .topbar .copiar.ok{color:var(--accent)}
+  @media (max-width:720px){
+    .topbar{padding:13px 0}
+    .barra{flex-direction:column;gap:9px}
+    .marca{text-align:center}
+    .links{gap:0;flex-wrap:wrap;justify-content:center}
+    .links a{padding:5px 9px;font-size:.71rem}
+  }
+
+  /* ---------- Hero centrado ---------- */
+  header{padding:220px 0 140px}
+  .hero{text-align:center}
   h1{
     font-family:var(--serif);
-    font-size:clamp(2.9rem,7vw,5rem);line-height:1.02;margin:0 0 22px;
-    letter-spacing:-.025em;font-weight:300;
+    font-size:clamp(3rem,8vw,6rem);line-height:1;margin:0 0 20px;
+    letter-spacing:-.03em;font-weight:300;
   }
   .role{
-    font-size:.8rem;color:var(--accent);
-    margin:0 0 26px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;
+    font-size:.76rem;color:var(--accent);
+    margin:0 0 34px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;
   }
   .tagline{
     font-family:var(--serif);font-weight:300;
-    font-size:clamp(1.15rem,2.3vw,1.5rem);line-height:1.55;
-    color:var(--muted);max-width:34ch;margin:0 0 40px;
+    font-size:clamp(1.05rem,2vw,1.32rem);line-height:1.65;
+    color:var(--muted);max-width:46ch;margin:0 auto;
   }
-  .disciplines{
-    list-style:none;margin:0;padding:0;
-    display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;
-    font-size:.83rem;color:var(--dim);letter-spacing:.02em;
+  @media (max-width:720px){ header{padding:170px 0 90px} }
+  @media (max-width:600px){ header{padding:150px 0 74px} }
+
+  /* ---------- Servicios ---------- */
+  .servicios{border-top:1px solid var(--border);padding-top:110px}
+  .serv-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);
+    gap:52px 44px;
   }
-  .disciplines li{display:flex;align-items:center;gap:16px}
-  .disciplines li:not(:last-child)::after{content:"";width:3px;height:3px;border-radius:50%;background:var(--border-hi)}
+  @media (max-width:640px){ .serv-grid{grid-template-columns:1fr;gap:38px} }
+  .serv h3{
+    font-family:var(--serif);font-weight:400;font-size:1.3rem;
+    margin:0 0 12px;letter-spacing:-.01em;
+    padding-bottom:14px;border-bottom:1px solid var(--border);
+  }
+  .serv p{margin:0;color:var(--muted);font-size:.93rem;line-height:1.7}
+
+  /* ---------- Experiencia ---------- */
+  .exp{list-style:none;margin:0;padding:0;max-width:76ch}
+  .exp li{
+    display:flex;gap:28px;padding:20px 0;
+    border-top:1px solid var(--border);
+  }
+  .exp li:last-child{border-bottom:1px solid var(--border)}
+  .exp-a{
+    flex:0 0 110px;font-size:.76rem;color:var(--accent);
+    letter-spacing:.1em;text-transform:uppercase;padding-top:3px;
+  }
+  .exp-b{flex:1;color:var(--muted);font-size:.93rem;line-height:1.65}
+  .exp-b strong{display:block;color:var(--text);font-weight:500;margin-bottom:3px}
+  @media (max-width:600px){
+    .exp li{flex-direction:column;gap:7px}
+    .exp-a{flex:none}
+  }
+
+  /* ---------- Contacto ---------- */
+  .contacto{border-top:1px solid var(--border);padding-top:110px;text-align:center}
+  .contacto-frase{
+    font-family:var(--serif);font-weight:300;
+    font-size:clamp(1.5rem,3.6vw,2.4rem);line-height:1.3;
+    color:var(--text);margin:0 0 36px;letter-spacing:-.02em;
+  }
+  .contacto-datos{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+  .contacto-datos a{
+    font-size:.9rem;color:var(--accent);text-decoration:none;
+    border:1px solid var(--accent-dim);border-radius:100px;
+    padding:11px 26px;transition:background .25s,color .25s;
+  }
+  .contacto-datos a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
   /* ---------- Secciones ---------- */
   section{padding:0 0 120px}
@@ -349,59 +408,69 @@
 #  pero no hace falta.
 # --------------------------------------------------------------------------
 
-@cats identidad, editorial, ilustracion
+@cats branding, social, video, ia
 
-== Proyecto de identidad
+== Proyecto de branding
 image:
-tags: Branding, Logotipo
+tags: Branding, Identidad visual
 link:
-cat: identidad
-Reemplazá este texto con la descripción del proyecto. Podés borrar este bloque entero desde el editor.
+cat: branding
+Reemplazá este texto con la descripción del proyecto. Este bloque de ejemplo se borra desde el editor.
 
 
-== Proyecto editorial
+== Campaña para redes
 image:
-tags: Editorial, InDesign
+tags: Social Media, Campaña
 link:
-cat: editorial
+cat: social
 Reemplazá este texto con la descripción del proyecto.
 
 
-== Serie de ilustración
+== Reel editado
 image:
-tags: Ilustración, Procreate
+tags: Video, Postproducción
 link:
-cat: ilustracion
+cat: video
 Reemplazá este texto con la descripción del proyecto.
 
+
+== Contenido con IA
+image:
+tags: IA, Dirección visual
+link:
+cat: ia
+Reemplazá este texto con la descripción del proyecto.
 </script>
 
 <!-- Redes y contacto. Cambiá los links por los de Daniela. -->
+<!-- Barra: marca a la izquierda, navegacion a la derecha -->
 <nav class="topbar">
-  <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
-  <a href="https://www.behance.net/" target="_blank" rel="noopener">Behance</a>
-  <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
-  <button class="copiar" data-copiar="daniela" type="button">WhatsApp</button>
-  <a href="mailto:hola@danieladavila.com">Email</a>
+  <div class="wrap barra">
+    <a class="marca" href="#inicio">
+      <span class="marca-n">Daniela Dávila</span>
+      <span class="marca-s">Diseño &amp; Contenido</span>
+    </a>
+    <div class="links">
+      <a href="#trabajos">Trabajos</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#sobre">Sobre mí</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </div>
 </nav>
 
-<header>
-  <div class="wrap">
-    <p class="role">Diseño &amp; Dirección de arte</p>
+<header id="inicio">
+  <div class="wrap hero">
     <h1>Daniela Dávila</h1>
+    <p class="role">Diseño · Social Media · Video · Inteligencia Artificial</p>
     <p class="tagline">
-      Trabajo con marcas que quieren verse como lo que realmente son.
+      Diseñadora gráfica y creadora de contenido digital. Construyo la
+      identidad visual de una marca y después la pongo a hablar todos los días.
     </p>
-    <ul class="disciplines">
-      <li>Identidad</li>
-      <li>Editorial</li>
-      <li>Ilustración</li>
-      <li>Dirección de arte</li>
-    </ul>
   </div>
 </header>
 
-<section>
+<section id="trabajos">
   <div class="wrap">
     <h2>Trabajos</h2>
     <div class="cats" id="cats"></div>
@@ -410,29 +479,113 @@ Reemplazá este texto con la descripción del proyecto.
   </div>
 </section>
 
-<section class="about">
+<section id="servicios" class="servicios">
+  <div class="wrap">
+    <h2>Servicios</h2>
+    <div class="serv-grid">
+      <div class="serv">
+        <h3>Diseño gráfico</h3>
+        <p>Branding, identidad visual, diseño publicitario y editorial.
+           Desarrollo de conceptos y líneas visuales para marcas.</p>
+      </div>
+      <div class="serv">
+        <h3>Social Media</h3>
+        <p>Posts, carruseles, stories y piezas publicitarias. Gestión de
+           contenido, copywriting y conceptualización de campañas.</p>
+      </div>
+      <div class="serv">
+        <h3>Video</h3>
+        <p>Edición y producción para Reels, TikTok y Shorts.
+           Postproducción y motion graphics.</p>
+      </div>
+      <div class="serv">
+        <h3>Inteligencia Artificial</h3>
+        <p>Generación y edición de imagen y video con IA, desarrollo de
+           prompts y dirección visual para producción de contenido.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sobre" class="about">
   <div class="wrap">
     <h2>Sobre mí</h2>
     <p>
-      Soy diseñadora y directora de arte. Trabajo en <strong>identidad
-      visual</strong>, <strong>diseño editorial</strong> e
-      <strong>ilustración</strong>, acompañando proyectos desde la idea
-      inicial hasta las piezas finales.
+      Soy <strong>diseñadora gráfica y creadora de contenido digital</strong>,
+      T.S.U. en Diseño Gráfico por el IUTIRLA. Desde 2011 trabajo con marcas en
+      diseño publicitario, social media, branding, edición de video e
+      inteligencia artificial aplicada.
     </p>
     <p>
-      Me interesa el diseño que se entiende sin explicaciones: claro,
-      cuidado y con carácter propio. Cada proyecto empieza escuchando.
+      Manejo el proceso completo: del concepto a la pieza final, y de la pieza
+      final a la publicación. Llevo contenido de marcas de sectores muy
+      distintos al mismo tiempo, y me formo constantemente — fotografía,
+      Meta &amp; Google Ads, After Effects, ilustración e IA.
     </p>
 
     <h3 class="about-sub">Herramientas</h3>
     <ul class="tools">
-      <li>Illustrator</li>
       <li>Photoshop</li>
+      <li>Illustrator</li>
       <li>InDesign</li>
-      <li>Figma</li>
-      <li>Procreate</li>
+      <li>Premiere Pro</li>
       <li>After Effects</li>
+      <li>CapCut</li>
+      <li>ChatGPT</li>
+      <li>Claude</li>
+      <li>Leonardo</li>
+      <li>Kling</li>
     </ul>
+
+    <h3 class="about-sub">Experiencia</h3>
+    <ul class="exp">
+      <li>
+        <span class="exp-a">2011 — hoy</span>
+        <span class="exp-b"><strong>Freelance para marcas</strong>
+          Diseño gráfico, social media, video y contenido con IA.</span>
+      </li>
+      <li>
+        <span class="exp-a">2021</span>
+        <span class="exp-b"><strong>Diseñadora gráfica</strong> · Texticentro / Roly / Stamina
+          Material POP, diseño de prendas y uniformes, ilustración y community management.</span>
+      </li>
+      <li>
+        <span class="exp-a">2019</span>
+        <span class="exp-b"><strong>Community manager y diseñadora</strong> · Mika Hogar
+          Gestión de redes, atención digital y ventas por WhatsApp e Instagram.</span>
+      </li>
+      <li>
+        <span class="exp-a">2018</span>
+        <span class="exp-b"><strong>Analista de publicidad y medios digitales</strong> · Clínica SoñaRes
+          Redes sociales, diseño gráfico y atención al cliente.</span>
+      </li>
+    </ul>
+
+    <h3 class="about-sub">Clientes</h3>
+    <ul class="tools">
+      <li>Grupo LYN</li>
+      <li>Supermotos EK</li>
+      <li>Electric Cars</li>
+      <li>Synapse Agents</li>
+      <li>Clínica SoñaRes</li>
+    </ul>
+
+    <h3 class="about-sub">Idiomas</h3>
+    <ul class="tools">
+      <li>Español — nativo</li>
+      <li>Inglés — intermedio</li>
+    </ul>
+  </div>
+</section>
+
+<section id="contacto" class="contacto">
+  <div class="wrap">
+    <h2>Contacto</h2>
+    <p class="contacto-frase">¿Tenés un proyecto en mente? Escribime.</p>
+    <div class="contacto-datos">
+      <a href="mailto:danielab.davilam@gmail.com">danielab.davilam@gmail.com</a>
+      <a href="https://wa.me/584123843463" target="_blank" rel="noopener">+58 412-384.34.63</a>
+    </div>
   </div>
 </section>
 
@@ -514,7 +667,7 @@ Reemplazá este texto con la descripción del proyecto.
   /* Las categorias salen de los datos: se pueden crear nuevas sin
      tocar el codigo. Estas tres tienen nombre propio por historia;
      cualquier otra se muestra tal cual la escribas. */
-  var ETIQUETAS = { 'identidad':'Identidad', 'editorial':'Editorial', 'ilustracion':'Ilustración' };
+  var ETIQUETAS = { 'branding':'Branding', 'social':'Social Media', 'video':'Video', 'ia':'Inteligencia Artificial' };
 
   /* El orden lo fija una linea "@cats a, b, c" arriba del bloque de
      datos. Si no esta, manda el orden en que van apareciendo. */
@@ -555,11 +708,11 @@ Reemplazá este texto con la descripción del proyecto.
   /* Completar el orden con las categorias que aparezcan y no esten
      listadas, para que nunca se pierda un proyecto por olvido. */
   items.forEach(function(p){
-    var c = (p.cat || 'identidad').trim() || 'identidad';
+    var c = (p.cat || 'branding').trim() || 'branding';
     p.cat = c;
     if (orden.indexOf(c) < 0) orden.push(c);
   });
-  if (!orden.length) orden = ['identidad'];
+  if (!orden.length) orden = ['branding'];
 
   var CATS = orden.map(function(id){
     return { id:id, label:ETIQUETAS[id] || id };

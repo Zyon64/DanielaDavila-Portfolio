@@ -397,8 +397,8 @@
      datos, asi se pueden crear nuevas y ninguna se pierde aunque
      se quede sin proyectos.
      --------------------------------------------------------- */
-  var ETIQUETAS  = { 'identidad':'Identidad', 'editorial':'Editorial', 'ilustracion':'Ilustración' };
-  var categorias = ['identidad', 'editorial', 'ilustracion'];
+  var ETIQUETAS  = { 'branding':'Branding', 'social':'Social Media', 'video':'Video', 'ia':'Inteligencia Artificial' };
+  var categorias = ['branding', 'social', 'video', 'ia'];
 
   function nombreCat(id){ return ETIQUETAS[id] || id; }
 
@@ -430,7 +430,7 @@
       if (!line || line.charAt(0) === '#') return;
       if (line.slice(0,2) === '=='){
         /* medios: [{src, file, destino}] — el primero es la portada */
-        cur = { title:line.slice(2).trim(), tags:'', link:'', cat:'identidad', desc:'', medios:[] };
+        cur = { title:line.slice(2).trim(), tags:'', link:'', cat:'branding', desc:'', medios:[] };
         out.push(cur);
         return;
       }
