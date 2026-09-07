@@ -25,7 +25,7 @@
     /* --- Texto: gris tinta, no negro puro --- */
     --text:#2E2830;
     --muted:#6E6472;
-    --dim:#9C93A0;
+    --dim:#6F6675;
 
     /* --- Acento: morado palido --- */
     --accent:#7A6480;
@@ -41,6 +41,85 @@
     --serif:"Fraunces",Georgia,"Times New Roman",serif;
     --sans:"Inter","Segoe UI",system-ui,sans-serif;
   }
+  /* --- Paleta oscura ---------------------------------------------
+     Se activa con el boton de la barra. Solo se redefinen los tokens:
+     ninguna regla de mas abajo sabe en que modo esta.
+
+     No es la paleta clara invertida. Sobre fondo oscuro el morado
+     palido queda gris, asi que el acento sube de saturacion; y el
+     texto no va blanco puro, que sobre oscuro vibra y cansa.       */
+  :root[data-tema="oscuro"]{
+    --bg:#171219;
+    --surface:#1F1922;
+    --surface-hi:#29212D;
+    --border:#332A38;
+    --border-hi:#473C4D;
+
+    --text:#EDE6EF;
+    --muted:#A79CAD;
+    --dim:#948A9C;
+
+    --accent:#C8A6D4;
+    --accent-dim:#9A82A6;
+    --accent-soft:#2C2233;
+    --glow:rgba(200,166,212,.22);
+
+    /* La franja se separa del fondo por arriba, no por abajo */
+    --deep:#2A1E36;
+    --deep-text:#EFE6EC;
+    --deep-accent:#E3B0D2;
+  }
+
+  /* El velo del banner es crema en claro y oscuro en oscuro, si no
+     la foto se ilumina de golpe contra el fondo negro. */
+  :root[data-tema="oscuro"] .banner::before{
+    background-image:
+      linear-gradient(rgba(23,18,25,.34),rgba(23,18,25,.34)),
+      url("img/servicios.png");
+  }
+
+  /* La sombra de los titulos sobre las fotos, un poco mas densa */
+  :root[data-tema="oscuro"] .card::after{
+    background:linear-gradient(to top,
+      rgba(12,8,15,.86) 0%,
+      rgba(12,8,15,.46) 26%,
+      rgba(12,8,15,0)   58%);
+  }
+
+  /* La barra de arriba usa el fondo con transparencia */
+  :root[data-tema="oscuro"] .topbar{background:rgba(23,18,25,.86)}
+
+  /* La categoria elegida: sobre el morado claro el texto va oscuro */
+  :root[data-tema="oscuro"] .cat.sel{color:#1B1420}
+  :root[data-tema="oscuro"] .cat.sel .cat-n{color:rgba(27,20,32,.65)}
+  :root[data-tema="oscuro"] .detalle-link:hover{color:#1B1420}
+  :root[data-tema="oscuro"] .contacto-datos a:hover{color:#1B1420}
+
+  /* Mientras el navegador aplica el tema guardado, nada de transicion:
+     si no, al cargar se ve el cambio de claro a oscuro. */
+  body,.topbar,.card,.cat,.tools li,.serv h3,.exp li,footer{
+    transition:background-color .25s, color .25s, border-color .25s;
+  }
+  :root.sin-transicion *{transition:none !important}
+
+  /* --- Boton de tema --- */
+  .tema{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;margin-left:8px;padding:0;
+    background:none;border:1px solid var(--border);border-radius:100px;
+    color:var(--muted);cursor:pointer;flex-shrink:0;
+    transition:color .25s,border-color .25s;
+  }
+  .tema:hover{color:var(--accent);border-color:var(--accent-dim)}
+  .tema svg{width:16px;height:16px;display:block;fill:none;
+            stroke:currentColor;stroke-width:1.7;
+            stroke-linecap:round;stroke-linejoin:round}
+  /* Se muestra el icono de lo que vas a obtener al apretarlo */
+  .tema .luna{display:block}
+  .tema .sol{display:none}
+  :root[data-tema="oscuro"] .tema .luna{display:none}
+  :root[data-tema="oscuro"] .tema .sol{display:block}
+
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
@@ -468,7 +547,7 @@
     .detalle-info{position:static}
   }
   /* La barra se apila en dos lineas y crece: el panel arranca mas abajo */
-  @media (max-width:720px){ .detalle{padding-top:124px} }
+  @media (max-width:720px){ .detalle{padding-top:152px} }
 
   .detalle-titulo{
     font-family:var(--serif);font-weight:300;
@@ -587,6 +666,34 @@
     html{scroll-behavior:auto}
   }
 </style>
+
+<script>
+/* Corre ANTES de dibujar nada: si esperara al final del documento, la
+   pagina se veria un instante en claro antes de pasar a oscuro.
+   Por eso va acá arriba y no junto al resto de los scripts. */
+(function(){
+  var raiz = document.documentElement;
+  var guardado = null;
+  try { guardado = localStorage.getItem('tema'); } catch(e){}
+
+  /* Sin eleccion previa, se respeta como tenga configurado el sistema */
+  if (!guardado){
+    guardado = (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches)
+               ? 'oscuro' : 'claro';
+  }
+  if (guardado === 'oscuro') raiz.setAttribute('data-tema', 'oscuro');
+
+  /* Al arrancar, sin animacion de colores: el fundido se habilita
+     recien despues del primer cuadro. */
+  raiz.classList.add('sin-transicion');
+  window.addEventListener('load', function(){
+    requestAnimationFrame(function(){
+      raiz.classList.remove('sin-transicion');
+    });
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -755,10 +862,13 @@ Fotografía de producto simulada con IA y retocada. Proyecto de prueba.
 
 == test
 image: img/chatgpt-image-6-sept-2026-19_32_59.png
+media: img/chatgpt-image-6-sept-2026-19_35_31.png
+media: img/chatgpt-image-6-sept-2026-19_32_59.png
+media: img/chatgpt-image-6-sept-2026-19_31_15.png
 tags: 
 link: 
 cat: redes sociales
-sdasdasadad
+sdasdasadadasdsdsdsdsdsd
 
 
 </script>
@@ -772,10 +882,21 @@ sdasdasadad
       <span class="marca-s">Diseño &amp; Contenido</span>
     </a>
     <div class="links">
+      <a href="#inicio">Inicio</a>
       <a href="#servicios">Servicios</a>
       <a href="#sobre">Sobre mí</a>
       <a href="#trabajos">Trabajos</a>
       <a href="#contacto">Contacto</a>
+      <button class="tema" id="tema" type="button"
+              aria-label="Cambiar entre claro y oscuro" title="Cambiar tema">
+        <svg class="luna" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>
+        </svg>
+        <svg class="sol" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.4 6.4 4.9 4.9M19.1 19.1l-1.5-1.5M17.6 6.4l1.5-1.5M4.9 19.1l1.5-1.5"/>
+        </svg>
+      </button>
     </div>
   </div>
 </nav>
@@ -1082,14 +1203,21 @@ sdasdasadad
     return { id:id, label:ETIQUETAS[id] || id };
   });
 
-  /* El panel secreto necesita saber que categorias y proyectos hay */
+  /* El panel secreto necesita saber que categorias y proyectos hay.
+     Va antes de agregar "Todos", que no es una categoria de verdad. */
   window.PF = { cats:CATS, items:items };
+
+  /* "Todos" adelante: es lo primero que se ve al entrar, con la obra
+     completa. No se guarda en @cats ni existe en los proyectos; es
+     solo un boton que no filtra nada. */
+  var TODOS = '__todos';
+  if (CATS.length > 1) CATS.unshift({ id:TODOS, label:'Todos' });
 
   /* --- Una columna por categoria, desplegable --- */
   var columnas = [];
 
   CATS.forEach(function(c){
-    var propios = items.filter(function(p){
+    var propios = (c.id === TODOS) ? items.slice() : items.filter(function(p){
       return p.cat === c.id;
     });
 
@@ -1746,6 +1874,37 @@ sdasdasadad
   }
 
   requestAnimationFrame(cuadro);
+})();
+</script>
+
+<script>
+/* ---------------------------------------------------------
+   Boton de tema. El atributo ya lo puso el script del <head>;
+   acá solo se cambia, se guarda y se avisa al navegador para
+   que pinte igual la barra del sistema en el telefono.
+   --------------------------------------------------------- */
+(function(){
+  var boton = document.getElementById('tema');
+  if (!boton) return;
+
+  var raiz = document.documentElement;
+  var meta = document.querySelector('meta[name="theme-color"]');
+
+  function pintarBarra(){
+    if (!meta) return;
+    meta.setAttribute('content',
+      raiz.getAttribute('data-tema') === 'oscuro' ? '#171219' : '#F6F1E7');
+  }
+  pintarBarra();
+
+  boton.addEventListener('click', function(){
+    var oscuro = raiz.getAttribute('data-tema') === 'oscuro';
+    if (oscuro) raiz.removeAttribute('data-tema');
+    else        raiz.setAttribute('data-tema', 'oscuro');
+
+    try { localStorage.setItem('tema', oscuro ? 'claro' : 'oscuro'); } catch(e){}
+    pintarBarra();
+  });
 })();
 </script>
 </body>

@@ -3,10 +3,13 @@ title Activar publicacion automatica
 cd /d "%~dp0"
 
 rem ---------------------------------------------------------------
-rem  Se usa la carpeta de Inicio del USUARIO, no una tarea programada.
-rem  Motivo: crear una tarea con "schtasks /sc onlogon" pide permisos
-rem  de administrador. La carpeta de Inicio es del usuario y no pide
-rem  nada, asi que esto funciona igual en una cuenta estandar.
+rem  Se usa la carpeta de Inicio del USUARIO, no una tarea programada:
+rem  crear una tarea con "schtasks /sc onlogon" pide permisos de
+rem  administrador. La carpeta de Inicio es del usuario y no pide nada.
+rem
+rem  El acceso directo apunta DIRECTO a powershell con la ventana
+rem  oculta. Antes habia un archivo .vbs intermedio, pero los .vbs son
+rem  de lo primero que borran los antivirus y las politicas de equipo.
 rem ---------------------------------------------------------------
 set "INICIO=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 set "ACCESO=%INICIO%\Portafolio - Publicador.lnk"
@@ -41,22 +44,18 @@ if "%op%"=="2" goto DESACTIVAR
 exit /b
 
 :ACTIVAR
-rem Lanzador invisible: evita que quede una ventana negra abierta
-> "%~dp0publicador-oculto.vbs" echo CreateObject("WScript.Shell").Run """%~dp0PUBLICADOR.bat""", 0, False
-
 if not exist "%INICIO%" mkdir "%INICIO%" 2>nul
 
-rem El acceso directo se crea con un VBS de un solo uso y despues se borra
-set "TMPVBS=%TEMP%\crear-acceso-portafolio.vbs"
-> "%TMPVBS%" echo Set sh = CreateObject("WScript.Shell")
->>"%TMPVBS%" echo Set lnk = sh.CreateShortcut("%ACCESO%")
->>"%TMPVBS%" echo lnk.TargetPath = "wscript.exe"
->>"%TMPVBS%" echo lnk.Arguments = """%~dp0publicador-oculto.vbs"""
->>"%TMPVBS%" echo lnk.WorkingDirectory = "%~dp0"
->>"%TMPVBS%" echo lnk.Description = "Publicador del portafolio de Daniela Davila"
->>"%TMPVBS%" echo lnk.Save
-wscript.exe //nologo "%TMPVBS%"
-del "%TMPVBS%" >nul 2>&1
+rem El acceso directo se arma con PowerShell y se borra a si mismo:
+rem no queda ningun archivo suelto en la carpeta del proyecto.
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$s=New-Object -ComObject WScript.Shell;" ^
+  "$l=$s.CreateShortcut('%ACCESO%');" ^
+  "$l.TargetPath='powershell.exe';" ^
+  "$l.Arguments='-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"%~dp0publicador.ps1\"';" ^
+  "$l.WorkingDirectory='%~dp0';" ^
+  "$l.Description='Publicador del portafolio de Daniela Davila';" ^
+  "$l.Save()"
 
 if not exist "%ACCESO%" goto ERROR
 
@@ -67,9 +66,12 @@ echo ===========================================
 echo.
 echo Arranca solo al iniciar sesion. Lo arranco ahora
 echo tambien para que no tengas que reiniciar.
-start "" wscript.exe "%~dp0publicador-oculto.vbs"
+start "" powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0publicador.ps1"
 echo.
 echo Ya podes cerrar esto y usar el editor normalmente.
+echo.
+echo Para comprobar que esta corriendo, en el editor el
+echo cartel de arriba te va a decir si esta activo.
 echo.
 pause
 exit /b
@@ -77,8 +79,9 @@ exit /b
 :DESACTIVAR
 del "%ACCESO%" >nul 2>&1
 
-rem Por si quedo activado con el metodo viejo, que usaba una tarea
+rem Por si quedo activado con alguno de los metodos viejos
 schtasks /delete /tn "PortafolioPublicador" /f >nul 2>&1
+del "%INICIO%\publicador-oculto.vbs.lnk" >nul 2>&1
 
 taskkill /fi "WINDOWTITLE eq Publicador del portafolio*" /f >nul 2>&1
 echo.
@@ -96,8 +99,8 @@ echo.
 echo Alternativa a mano, sin permisos especiales:
 echo   1. Apreta Windows + R
 echo   2. Escribi:  shell:startup   y dale Enter
-echo   3. Arrastra ahi el archivo publicador-oculto.vbs
-echo      de esta carpeta, con boton derecho, y elegi
-echo      "Crear iconos de acceso directo aqui".
+echo   3. Se abre la carpeta de Inicio. Arrastra ahi
+echo      PUBLICADOR.bat de esta carpeta con el boton
+echo      DERECHO y elegi "Crear iconos de acceso directo aqui".
 echo.
 pause

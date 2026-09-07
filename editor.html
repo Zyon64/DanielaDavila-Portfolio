@@ -196,10 +196,14 @@
 
   /* Estado de subida de los videos */
   .estado{
-    padding:11px 16px;background:#0d1411;
+    padding:11px 16px;background:var(--surface);
     border-bottom:1px solid var(--border);flex-shrink:0;
   }
   .estado.hidden{display:none}
+  /* Cuando algo falla, el cartel se pinta de rojo */
+  .estado.fallo{border-left:3px solid var(--danger)}
+  .estado.fallo #estado-txt{color:var(--danger)}
+  .estado.fallo #estado-fill{background:var(--danger)}
   .estado-cab{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.77rem}
   .estado-cab strong{flex:1;font-weight:400;color:var(--muted)}
   .estado-cab button{padding:5px 11px;font-size:.72rem}
@@ -1037,8 +1041,25 @@
      Estado de las subidas, leyendo SOLO la carpeta del disco.
      Nada de consultar la web: es instantaneo, no gasta red y no
      puede dar falsos negativos.
+
+     La consola del publicador corre oculta, asi que estos archivos
+     son la unica forma de saber que pasa:
+       _estado.txt     el archivo que se esta subiendo ahora
+       _vivo.txt       latido: si esta viejo, no hay publicador
+       _publicado.txt  resultado de la ultima publicacion
      ========================================================= */
-  var vigia = null, totalTanda = 0;
+  var vigia = null, totalTanda = 0, momentoGuardado = 0;
+
+  async function leerArchivo(dir, nombre){
+    try { return await (await (await dir.getFileHandle(nombre)).getFile()).text(); }
+    catch(e){ return null; }
+  }
+
+  function campo(txt, k){
+    if (!txt) return '';
+    var m = txt.match(new RegExp('^' + k + '=(.*)$', 'm'));
+    return m ? m[1].trim() : '';
+  }
 
   async function pendientes(){
     if (!dirHandle) return null;
@@ -1050,38 +1071,101 @@
         if (e.kind !== 'file') continue;
 
         if (e.name === '_estado.txt'){
-          try{
-            var txt  = await (await e.getFile()).text();
-            var leer = function(k){
-              var m = txt.match(new RegExp('^' + k + '=(.*)$', 'm'));
-              return m ? m[1].trim() : '';
-            };
-            actual = leer('archivo');
-            fase   = leer('fase');
-            pct    = parseFloat(leer('pct'));
-            if (isNaN(pct)) pct = -1;
-          } catch(err){}
+          var txt = await leerArchivo(dir, '_estado.txt');
+          actual = campo(txt, 'archivo');
+          fase   = campo(txt, 'fase');
+          pct    = parseFloat(campo(txt, 'pct'));
+          if (isNaN(pct)) pct = -1;
           continue;
         }
         if (e.name.charAt(0) === '_') continue;
         faltan.push(e.name);
       }
-      return { faltan:faltan, actual:actual, fase:fase, pct:pct };
-    } catch(err){ return { faltan:[], actual:'', fase:'', pct:0 }; }
+
+      var vivo = await leerArchivo(dir, '_vivo.txt');
+      var pub  = await leerArchivo(dir, '_publicado.txt');
+
+      return {
+        faltan: faltan, actual: actual, fase: fase, pct: pct,
+        latido: vivo ? Date.parse(vivo.trim()) : 0,
+        pubHora: pub ? Date.parse(campo(pub, 'hora')) : 0,
+        pubEstado: campo(pub, 'resultado'),
+        pubDetalle: campo(pub, 'detalle')
+      };
+    } catch(err){
+      return { faltan:[], actual:'', fase:'', pct:0, latido:0, pubHora:0, pubEstado:'', pubDetalle:'' };
+    }
+  }
+
+  function pararVigia(){
+    if (vigia){ clearInterval(vigia); vigia = null; }
+    totalTanda = 0;
+  }
+
+  /* Cuando termina, el cartel se queda un rato y despues se va solo */
+  function terminar(clase, texto){
+    pararVigia();
+    $('estado').classList.remove('hidden');
+    $('estado-fill').classList.remove('indeterminado');
+    $('estado-fill').style.width = '100%';
+    $('estado-txt').textContent = texto;
+    $('estado').classList.toggle('fallo', clase === 'error');
+    $('estado-lista').classList.add('hidden');
+    note('');
+    setTimeout(function(){
+      if (!vigia) $('estado').classList.add('hidden');
+    }, clase === 'error' ? 20000 : 7000);
   }
 
   async function vigilarSubidas(){
     var est = await pendientes();
     if (!est) return;
 
-    if (!est.faltan.length){
-      if (vigia){ clearInterval(vigia); vigia = null; }
-      totalTanda = 0;
-      $('estado').classList.add('hidden');
+    var ahora = Date.now();
+
+    /* ¿El publicador esta corriendo? El latido se reescribe cada
+       3 segundos; con 25 lo damos por caido. */
+    var vivo = est.latido && (ahora - est.latido) < 25000;
+
+    $('estado').classList.remove('hidden');
+
+    if (!vivo){
+      $('estado-fill').style.width = '100%';
+      $('estado-fill').classList.remove('indeterminado');
+      $('estado').classList.add('fallo');
+      $('estado-txt').textContent =
+        'Guardado en el disco, pero el publicador no esta corriendo. Abri PUBLICADOR.bat';
+      note('');
+      if (!vigia) vigia = setInterval(vigilarSubidas, 2000);
+      return;
+    }
+    $('estado').classList.remove('fallo');
+
+    /* Resultado nuevo, posterior a este guardado */
+    var reciente = est.pubHora && est.pubHora >= momentoGuardado - 2000;
+
+    if (reciente && est.pubEstado === 'error'){
+      terminar('error', 'No se pudo publicar: ' + (est.pubDetalle || 'error desconocido'));
       return;
     }
 
-    $('estado').classList.remove('hidden');
+    /* Nada en cola y el publicador ya dio por cerrada la tanda */
+    if (!est.faltan.length){
+      if (reciente && (est.pubEstado === 'listo' || est.pubEstado === 'ok')){
+        var hora = new Date(est.pubHora).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        terminar('ok', 'Publicado a las ' + hora + ' — ' + (est.pubDetalle || 'listo'));
+        return;
+      }
+      /* Todavia no contesto: se sigue esperando */
+      $('estado-fill').classList.add('indeterminado');
+      $('estado-fill').style.width = '100%';
+      $('estado-txt').textContent = 'Publicando la pagina...';
+      $('estado-lista').classList.add('hidden');
+      if (!vigia) vigia = setInterval(vigilarSubidas, 2000);
+      return;
+    }
+
+    /* Hay archivos en cola: barra con el avance real */
     if (est.faltan.length > totalTanda) totalTanda = est.faltan.length;
 
     var hechos  = totalTanda - est.faltan.length;
@@ -1115,7 +1199,6 @@
 
     if (!vigia) vigia = setInterval(vigilarSubidas, 2000);
   }
-
   $('estado-ver').addEventListener('click', function(){
     $('estado-lista').classList.toggle('hidden');
     this.textContent = $('estado-lista').classList.contains('hidden') ? 'Ver detalle' : 'Ocultar';
@@ -1289,7 +1372,8 @@
         await fw.close();
       } catch(e){ /* si falla, el publicador lo detecta igual por los cambios */ }
 
-      note('Guardado. Publicando...');
+      note("");
+      momentoGuardado = Date.now();   // desde acá cuenta el resultado nuevo
       vigilarSubidas();
       await cargarExistentes();
         renderList();

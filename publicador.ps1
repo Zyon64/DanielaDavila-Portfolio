@@ -68,6 +68,30 @@ function Estado($archivo, $fase, $pct, $i, $total){
 function LimpiarEstado(){ if (Test-Path $ESTADO) { Remove-Item $ESTADO -Force -EA SilentlyContinue } }
 
 # ---------------------------------------------------------------------
+#  Señales para el editor.
+#  La consola del publicador corre oculta, asi que el editor no puede
+#  ver nada de lo que se escribe con Log. Estos dos archivos son la
+#  unica forma que tiene de saber que esta pasando.
+#
+#  _vivo.txt       se reescribe en cada vuelta. Si esta viejo, el
+#                  publicador no esta corriendo.
+#  _publicado.txt  el resultado de la ultima publicacion.
+# ---------------------------------------------------------------------
+$VIVO      = Join-Path $BANDEJA '_vivo.txt'
+$PUBLICADO = Join-Path $BANDEJA '_publicado.txt'
+
+function Latido(){
+    if (-not (Test-Path $BANDEJA)) { return }
+    try { [IO.File]::WriteAllText($VIVO, (Get-Date -Format 'o')) } catch {}
+}
+
+function Resultado($estado, $detalle){
+    if (-not (Test-Path $BANDEJA)) { return }
+    $txt = "hora=$(Get-Date -Format 'o')`nresultado=$estado`ndetalle=$detalle`n"
+    try { [IO.File]::WriteAllText($PUBLICADO, $txt) } catch {}
+}
+
+# ---------------------------------------------------------------------
 #  Optimizar: 720p, tope de 2 Mbps y el indice al principio del archivo
 # ---------------------------------------------------------------------
 function Optimizar($ruta, $nombre, $i, $total){
@@ -199,7 +223,13 @@ Write-Host 'Guarda en el editor y esto hace el resto.'
 Write-Host 'Podes minimizar esta ventana.'
 Write-Host ''
 
+# La bandeja tiene que existir desde el arranque: es donde se dejan las
+# señales que lee el editor.
+New-Item -ItemType Directory -Path $BANDEJA -Force | Out-Null
+Latido
+
 while ($true){
+    Latido
     Start-Sleep -Seconds 3
 
     $flag      = Join-Path $BANDEJA '_publicar.flag'
@@ -216,6 +246,7 @@ while ($true){
 
     # --- 1) LA PAGINA PRIMERO ---
     # Los textos y el orden se ven enseguida; los videos van llegando.
+    Resultado 'trabajando' 'Publicando la pagina'
     & git add . | Out-Null
     $grandes0 = (& git diff --cached --name-only) |
                 Where-Object { Test-Path -LiteralPath $_ } |
@@ -224,18 +255,30 @@ while ($true){
         Log "Freno: archivos de mas de $TOPE_MB MB, no se sube nada."
         $grandes0 | ForEach-Object { Write-Host "   $_" }
         & git reset -q
+        Resultado 'error' ("Hay archivos de mas de $TOPE_MB MB: " + (($grandes0 | ForEach-Object { Split-Path $_ -Leaf }) -join ', '))
     } else {
         & git diff --cached --quiet
         if ($LASTEXITCODE -ne 0){
             Log 'Publicando la pagina...'
             & git commit -q -m 'Actualizacion del portafolio'
             & git push -q
-            if ($LASTEXITCODE -eq 0){ Log 'Pagina publicada. Ahora van los videos.' }
+            if ($LASTEXITCODE -eq 0){
+                Log 'Pagina publicada. Ahora van los videos.'
+                Resultado 'ok' 'Pagina publicada'
+            } else {
+                Log 'Fallo el push. Reviso la conexion o las credenciales.'
+                Resultado 'error' 'No se pudo subir a GitHub. Revisa la conexion o el acceso al repositorio.'
+            }
+        } else {
+            # No habia nada que publicar: igual hay que avisar, si no el
+            # editor se queda esperando para siempre.
+            Resultado 'ok' 'No habia cambios para publicar'
         }
     }
-
     # --- 2) medios ---
     $total = $archivos.Count
+    if ($total -gt 0){ Resultado 'trabajando' "Subiendo $total archivo(s)" }
+    $fallaron = 0
     for ($i = 0; $i -lt $total; $i++){
         $f = $archivos[$i]
         $subirEsto = $f.FullName
@@ -245,10 +288,16 @@ while ($true){
         if (Subir $subirEsto $f.Name ($i+1) $total){
             Remove-Item $f.FullName -Force -EA SilentlyContinue
             if ($subirEsto -ne $f.FullName){ Remove-Item $subirEsto -Force -EA SilentlyContinue }
+        } else {
+            $fallaron++
         }
     }
     LimpiarEstado
 
-    LimpiarEstado
+    if ($fallaron -gt 0){
+        Resultado 'error' "$fallaron archivo(s) no se pudieron subir. Se reintenta solo."
+    } else {
+        Resultado 'listo' 'Todo publicado'
+    }
     Log "Todo al dia."
 }
