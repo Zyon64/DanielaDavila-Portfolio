@@ -1,0 +1,32 @@
+CARPETA DE CONTENIDO
+====================
+
+Acá van las imágenes y videos de los proyectos.
+
+Cómo usarla
+-----------
+1. Copiá los archivos dentro de esta carpeta.
+2. Abrí editor.html, elegí el proyecto y agregá los medios.
+   El editor los toma de acá solo.
+
+Nombres
+-------
+Sin espacios ni acentos. Usá guiones:
+   grupo-lyn-portada.jpg
+   grupo-lyn-01.jpg
+   supermotos-reel.mp4
+
+La PRIMERA imagen de cada proyecto es la portada: la que se ve en la
+cuadrícula de Trabajos. Conviene que sea la más fuerte.
+
+Formatos y peso
+---------------
+Fotos    ->  .jpg  (no .png, pesa mucho más)
+Videos   ->  .mp4
+
+Mantené cada foto por debajo de 400 KB. Una imagen de 3000px de ancho
+no se ve mejor en la web, solo tarda más en cargar. Con 1600px de
+ancho alcanza y sobra.
+
+Los videos NO van acá: son muy pesados para el repositorio. Subilos con
+SUBIR-VIDEO.bat, que los publica aparte y te da el enlace.

@@ -313,30 +313,87 @@
     border:1px dashed var(--border);border-radius:4px;
   }
 
-  /* ---------- Cuadricula ---------- */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:44px 32px}
-  @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr);gap:36px 24px} }
+  /* ---------- Cuadricula asimetrica ----------
+     Seis columnas y filas chicas. Cada tarjeta ocupa una cantidad
+     distinta de columnas y filas segun su posicion, asi los tamaños
+     salen desparejos pero todo sigue alineado a la misma grilla.
+     `dense` hace que los huecos se rellenen solos.                */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    grid-auto-rows:78px;
+    grid-auto-flow:dense;
+    gap:20px;
+  }
+  /* El patron se repite cada 6 tarjetas y no es simetrico a proposito */
+  .card{grid-column:span 3;grid-row:span 5}
+  .card.t2{grid-column:span 3;grid-row:span 4}
+  .card.t3{grid-column:span 2;grid-row:span 4}
+  .card.t4{grid-column:span 4;grid-row:span 5}
+  .card.t5{grid-column:span 2;grid-row:span 5}
+  .card.t6{grid-column:span 4;grid-row:span 4}
+
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(4,1fr);grid-auto-rows:68px;gap:16px}
+    .card,.card.t2{grid-column:span 2;grid-row:span 4}
+    .card.t3,.card.t5{grid-column:span 2;grid-row:span 5}
+    .card.t4,.card.t6{grid-column:span 4;grid-row:span 5}
+  }
   @media (max-width:600px){
-    .grid{grid-template-columns:1fr}
+    .grid{grid-template-columns:1fr;grid-auto-rows:auto;gap:16px}
+    .card,.card.t2,.card.t3,.card.t4,.card.t5,.card.t6{
+      grid-column:1;grid-row:auto;aspect-ratio:4/3;
+    }
   }
 
   .card{
-    background:transparent;border:none;border-radius:0;
-    cursor:pointer;position:relative;
-    transition:opacity .3s;
+    position:relative;cursor:pointer;
+    border:none;border-radius:4px;
+    background:var(--surface);
+    overflow:hidden;                 /* el zoom no se sale del cuadro */
   }
-  .card:hover{opacity:.72}
   canvas.dissolve{position:absolute;inset:0;z-index:3;pointer-events:none}
   canvas.dissolve.fija{position:fixed;z-index:10}
 
+  /* Capa de la imagen: es la que hace zoom, no la tarjeta */
   .thumb{
-    position:relative;
-    aspect-ratio:4/3;background:var(--surface);display:flex;
-    align-items:center;justify-content:center;color:var(--dim);
-    font-size:.8rem;border-radius:3px;overflow:hidden;
-    border:1px solid var(--border);
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--dim);font-size:.8rem;
+    transition:transform .7s cubic-bezier(.2,.7,.3,1);
+    will-change:transform;
   }
   .thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block}
+  .card:hover .thumb,
+  .card:focus-visible .thumb{transform:scale(1.07)}
+
+  /* Sombra de abajo hacia arriba: el titulo se lee sobre cualquier
+     foto, sea clara, oscura o revuelta. */
+  .card::after{
+    content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top,
+      rgba(32,24,36,.82) 0%,
+      rgba(32,24,36,.42) 26%,
+      rgba(32,24,36,0)   58%);
+  }
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  .card-body{
+    position:absolute;left:0;right:0;bottom:0;z-index:2;
+    padding:20px 22px;
+  }
+  .card h3{
+    font-family:var(--serif);font-weight:400;color:#fff;
+    margin:0;font-size:clamp(1.05rem,1.5vw,1.45rem);
+    letter-spacing:-.01em;line-height:1.2;
+    text-shadow:0 1px 14px rgba(20,14,24,.5);
+  }
+  .card .card-cat{
+    display:block;margin:0 0 6px;
+    font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--deep-accent);
+    text-shadow:0 1px 12px rgba(20,14,24,.6);
+  }
 
   .spinner{
     position:absolute;inset:0;margin:auto;
@@ -347,77 +404,96 @@
   @keyframes girar{to{transform:rotate(360deg)}}
 
   .sello{
-    position:absolute;right:9px;bottom:9px;z-index:2;
+    position:absolute;right:12px;top:12px;z-index:2;
     display:flex;align-items:center;justify-content:center;
-    width:23px;height:23px;border-radius:50%;
-    background:rgba(251,247,240,.85);border:1px solid var(--border);
+    width:24px;height:24px;border-radius:50%;
+    background:rgba(32,24,36,.5);border:1px solid rgba(255,255,255,.28);
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-    color:var(--muted);
+    color:#fff;
   }
   .sello svg{width:12px;height:12px;fill:currentColor;display:block}
 
   .cuenta{
-    position:absolute;left:9px;bottom:9px;z-index:2;
-    font-size:.68rem;color:var(--muted);
-    background:rgba(251,247,240,.85);border:1px solid var(--border);
+    position:absolute;right:12px;bottom:14px;z-index:2;
+    font-size:.68rem;color:#fff;
+    background:rgba(32,24,36,.5);border:1px solid rgba(255,255,255,.28);
     border-radius:100px;padding:2px 10px;
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   }
   .cuenta::after{content:" piezas"}
 
-  .card-body{padding:18px 2px 0}
-  .card h3{
-    font-family:var(--serif);font-weight:400;
-    margin:0 0 7px;font-size:1.24rem;letter-spacing:-.01em;line-height:1.25;
-  }
-  .card p{margin:0 0 13px;color:var(--muted);font-size:.9rem;line-height:1.6}
   .tags span{
     font-size:.71rem;color:var(--accent);
     background:var(--accent-soft);border:none;
     padding:3px 11px;border-radius:100px;margin:0 5px 5px 0;display:inline-block;
   }
 
-  /* ---------- Panel de detalle ---------- */
+  /* ---------- Panel de detalle ----------
+     Dos columnas: a la izquierda los datos del proyecto, que quedan
+     pegados arriba (sticky) mientras a la derecha se recorre la
+     galeria. En pantalla angosta se apila y los datos van primero. */
   .detalle{
     position:fixed;inset:0;z-index:95;
     background:var(--bg);
     overflow-y:auto;overscroll-behavior:contain;
-    padding:120px 0 100px;
+    padding:112px 0 100px;
   }
   .detalle[hidden]{display:none}
 
   .volver{
     font-size:.82rem;color:var(--muted);
     background:none;border:none;
-    padding:0;cursor:pointer;margin-bottom:38px;
+    padding:0;cursor:pointer;margin-bottom:34px;
     transition:color .25s;
   }
   .volver::before{content:"\2190\00a0\00a0"}
   .volver:hover{color:var(--accent)}
 
+  .detalle-cols{
+    display:grid;
+    grid-template-columns:minmax(260px,34%) 1fr;
+    gap:56px;
+    align-items:start;
+  }
+  .detalle-info{
+    position:sticky;
+    top:112px;                       /* deja libre la barra de arriba */
+    align-self:start;
+  }
+  @media (max-width:860px){
+    .detalle-cols{grid-template-columns:1fr;gap:36px}
+    .detalle-info{position:static}
+  }
+
   .detalle-titulo{
     font-family:var(--serif);font-weight:300;
-    font-size:clamp(2rem,4.6vw,3.2rem);line-height:1.08;
-    letter-spacing:-.025em;margin:0 0 18px;
+    font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.1;
+    text-transform:none;   /* la regla global de h2 la ponia en mayusculas */
+    letter-spacing:-.025em;margin:0 0 16px;
   }
-  .detalle-tags{margin-bottom:24px}
+  .detalle-cat{
+    display:block;margin:0 0 10px;
+    font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--accent);font-weight:500;
+  }
+  .detalle-tags{margin-bottom:22px}
   .detalle-desc{
-    color:var(--muted);max-width:62ch;font-size:1.02rem;margin:0 0 30px;
+    color:var(--muted);font-size:.98rem;line-height:1.75;margin:0 0 26px;
   }
   .detalle-link{
     font-size:.82rem;color:var(--accent);
     text-decoration:none;border:1px solid var(--accent-dim);border-radius:100px;
-    padding:10px 22px;display:inline-block;margin-bottom:44px;
+    padding:10px 22px;display:inline-block;
     transition:background .25s,color .25s;
   }
   .detalle-link::after{content:"\00a0\00a0\2197"}
   .detalle-link:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   .detalle-link[hidden]{display:none}
 
-  .galeria-detalle,.detalle-media{display:flex;flex-direction:column;gap:36px}
+  .galeria-detalle,.detalle-media{display:flex;flex-direction:column;gap:24px}
   .visor{
     position:relative;background:var(--surface);border:1px solid var(--border);
-    border-radius:3px;overflow:hidden;min-height:120px;
+    border-radius:4px;overflow:hidden;min-height:120px;
     display:flex;align-items:center;justify-content:center;
     color:var(--dim);font-size:.82rem;
   }
@@ -561,9 +637,9 @@ Reemplazá este texto con la descripción del proyecto.
       <span class="marca-s">Diseño &amp; Contenido</span>
     </a>
     <div class="links">
-      <a href="#trabajos">Trabajos</a>
       <a href="#servicios">Servicios</a>
       <a href="#sobre">Sobre mí</a>
+      <a href="#trabajos">Trabajos</a>
       <a href="#contacto">Contacto</a>
     </div>
   </div>
@@ -604,15 +680,6 @@ Reemplazá este texto con la descripción del proyecto.
 </section>
 
 <div class="tras-franja">
-
-<section id="trabajos">
-  <div class="wrap">
-    <h2>Trabajos</h2>
-    <div class="cats" id="cats"></div>
-    <h3 class="cat-title" id="cat-title"></h3>
-    <div class="grid" id="panel"></div>
-  </div>
-</section>
 
 
 <!-- Banner: la foto queda fija y la pagina pasa por encima -->
@@ -717,6 +784,16 @@ Reemplazá este texto con la descripción del proyecto.
   </div>
 </section>
 
+<section id="trabajos">
+  <div class="wrap">
+    <h2>Trabajos</h2>
+    <div class="cats" id="cats"></div>
+    <h3 class="cat-title" id="cat-title"></h3>
+    <div class="grid" id="panel"></div>
+  </div>
+</section>
+
+
 <section id="contacto" class="contacto">
   <div class="wrap">
     <h2>Contacto</h2>
@@ -733,11 +810,17 @@ Reemplazá este texto con la descripción del proyecto.
 <div class="detalle" id="detalle" hidden>
   <div class="detalle-caja wrap">
     <button class="volver" id="volver" type="button">Volver</button>
-    <h2 class="detalle-titulo" id="detalle-titulo"></h2>
-    <div class="tags detalle-tags" id="detalle-tags"></div>
-    <p class="detalle-desc" id="detalle-desc"></p>
-    <a class="detalle-link" id="detalle-link" target="_blank" rel="noopener" hidden>Ver proyecto</a>
-    <div class="detalle-media" id="detalle-media"></div>
+    <div class="detalle-cols">
+      <!-- Columna fija: acompaña mientras se recorre la galeria -->
+      <div class="detalle-info">
+        <span class="detalle-cat" id="detalle-cat"></span>
+        <h2 class="detalle-titulo" id="detalle-titulo"></h2>
+        <div class="tags detalle-tags" id="detalle-tags"></div>
+        <p class="detalle-desc" id="detalle-desc"></p>
+        <a class="detalle-link" id="detalle-link" target="_blank" rel="noopener" hidden>Ver proyecto</a>
+      </div>
+      <div class="detalle-media" id="detalle-media"></div>
+    </div>
   </div>
 </div>
 
@@ -964,25 +1047,21 @@ Reemplazá este texto con la descripción del proyecto.
     if (!elegidos.length){
       var vacio = document.createElement('p');
       vacio.className = 'cat-empty';
-      vacio.textContent = 'nothing here yet';
+      vacio.textContent = 'todavía no hay nada acá';
       panel.appendChild(vacio);
       return;
     }
 
-    /* cuantas columnas tiene la cuadricula ahora mismo */
-    var cols = getComputedStyle(panel).gridTemplateColumns.split(' ').length || 1;
-
     elegidos.forEach(function(p, i){
-      var card = tarjeta(p);
+      var card = tarjeta(p, i);
       panel.appendChild(card);
 
       if (quieto || document.hidden || !card.animate) return;
 
-      /* La ola avanza en diagonal: arriba-izquierda primero,
-         abajo-derecha al final. */
-      var fila = Math.floor(i / cols);
-      var col  = i % cols;
-      var demora = (fila + col) * 110;
+      /* Las tarjetas ya no van en filas parejas (cada una ocupa lo
+         suyo), asi que la ola sigue el orden de aparicion y se
+         frena a los 8 escalones para no hacerse eterna. */
+      var demora = Math.min(i, 8) * 95;
 
       /* solo el movimiento: la aparicion la hace la mascara de pixeles */
       card.animate(
@@ -1095,8 +1174,10 @@ Reemplazá este texto con la descripción del proyecto.
 
   function abrirDetalle(p){
     if (window.contar) window.contar('p-' + p.title);
-    document.getElementById('detalle-titulo').textContent = p.title || 'Untitled';
+    document.getElementById('detalle-titulo').textContent = p.title || 'Sin título';
     document.getElementById('detalle-desc').textContent   = p.desc.join(' ');
+    var idcat = (p.cat || '').trim();
+    document.getElementById('detalle-cat').textContent    = ETIQUETAS[idcat] || idcat;
 
     var tags = document.getElementById('detalle-tags');
     tags.innerHTML = '';
@@ -1311,60 +1392,59 @@ Reemplazá este texto con la descripción del proyecto.
   }
 
   /* --- Armado de una tarjeta --- */
-  function tarjeta(p){
+  /* Los seis tamaños de la cuadricula, en orden. El indice de la
+     tarjeta elige uno, asi el patron se repite cada seis y las
+     medidas quedan desparejas sin depender del azar (que cambiaria
+     en cada visita). */
+
+  function tarjeta(p, i){
+    var TAMANOS = ["", "t2", "t3", "t4", "t5", "t6"];
+    var tam  = TAMANOS[(i || 0) % TAMANOS.length];
     var card = document.createElement('article');
-    card.className = 'card';
+    card.className = 'card' + (tam ? ' ' + tam : '');
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', p.title || 'Proyecto');
 
     var medios = mediosDe(p);
     var thumb  = document.createElement('div');
     thumb.className = 'thumb';
 
     if (medios.length){
-      montarMedia(thumb, medios[0], p.title, true);
-      /* si hay mas de uno, se avisa en la portada */
-      if (medios.length > 1){
-        var cuenta = document.createElement('span');
-        cuenta.className = 'cuenta';
-        cuenta.textContent = medios.length;
-        thumb.appendChild(cuenta);
-      }
+      montarMedia(thumb, medios[0], p.title, false);
     } else {
-      thumb.textContent = '16:9 image';
+      thumb.textContent = 'sin imagen';
     }
     card.appendChild(thumb);
+
+    /* El contador va sobre la tarjeta, no sobre la capa que hace
+       zoom: si no, se moveria con ella. */
+    if (medios.length > 1){
+      var cuenta = document.createElement('span');
+      cuenta.className = 'cuenta';
+      cuenta.textContent = medios.length;
+      card.appendChild(cuenta);
+    }
 
     card.addEventListener('click', function(){ abrirDetalle(p); });
     card.addEventListener('keydown', function(e){
       if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrirDetalle(p); }
     });
 
+    /* Titulo encima de la foto. La sombra de abajo (.card::after) le
+       da contraste salga como salga la imagen. */
     var body = document.createElement('div');
     body.className = 'card-body';
 
+    var idc = (p.cat || '').trim();
+    var cat = document.createElement('span');
+    cat.className = 'card-cat';
+    cat.textContent = ETIQUETAS[idc] || idc;
+    body.appendChild(cat);
+
     var h3 = document.createElement('h3');
-    h3.textContent = p.title || 'Untitled';
+    h3.textContent = p.title || 'Sin título';
     body.appendChild(h3);
-
-    if (p.desc.length){
-      var d = document.createElement('p');
-      d.textContent = p.desc.join(' ');
-      body.appendChild(d);
-    }
-
-    if (p.tags){
-      var tags = document.createElement('div');
-      tags.className = 'tags';
-      p.tags.split(',').forEach(function(t){
-        t = t.trim();
-        if (!t) return;
-        var s = document.createElement('span');
-        s.textContent = t;
-        tags.appendChild(s);
-      });
-      body.appendChild(tags);
-    }
 
     card.appendChild(body);
     return card;
