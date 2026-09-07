@@ -129,7 +129,7 @@
   .franja{
     position:relative;z-index:2;
     background:var(--deep);color:var(--deep-text);
-    padding:130px 0 140px;text-align:center;
+    padding:98px 0 104px;text-align:center;
   }
   .franja-marca{
     font-family:var(--serif);font-weight:400;
@@ -148,7 +148,7 @@
   .franja p.franja-lema{
     color:var(--deep-accent);font-weight:600;
     font-size:.86rem;letter-spacing:.13em;text-transform:uppercase;
-    margin:52px auto 0;line-height:1.9;
+    margin:38px auto 0;line-height:1.85;
   }
   @media (max-width:600px){ .franja{padding:90px 0 96px} }
 
@@ -166,7 +166,7 @@
   .banner{
     position:relative;
     isolation:isolate;             /* la mezcla no se escapa de acá */
-    min-height:clamp(340px,54vh,520px);
+    min-height:clamp(280px,42vh,420px);
     display:flex;align-items:center;justify-content:center;
     background-color:var(--accent-soft);
     overflow:hidden;
@@ -224,23 +224,23 @@
   }
 
   /* ---------- Servicios ---------- */
-  .servicios{padding-top:96px}
+  .servicios{padding-top:56px}
   .serv-grid{
     display:grid;grid-template-columns:repeat(2,1fr);
-    gap:52px 44px;
+    gap:30px 40px;
   }
-  @media (max-width:640px){ .serv-grid{grid-template-columns:1fr;gap:38px} }
+  @media (max-width:640px){ .serv-grid{grid-template-columns:1fr;gap:26px} }
   .serv h3{
     font-family:var(--serif);font-weight:400;font-size:1.3rem;
-    margin:0 0 12px;letter-spacing:-.01em;
-    padding-bottom:14px;border-bottom:1px solid var(--border);
+    margin:0 0 9px;letter-spacing:-.01em;
+    padding-bottom:10px;border-bottom:1px solid var(--border);
   }
   .serv p{margin:0;color:var(--muted);font-size:.93rem;line-height:1.7}
 
   /* ---------- Experiencia ---------- */
   .exp{list-style:none;margin:0;padding:0;max-width:76ch}
   .exp li{
-    display:flex;gap:28px;padding:20px 0;
+    display:flex;gap:24px;padding:13px 0;
     border-top:1px solid var(--border);
   }
   .exp li:last-child{border-bottom:1px solid var(--border)}
@@ -256,7 +256,7 @@
   }
 
   /* ---------- Contacto ---------- */
-  .contacto{border-top:1px solid var(--border);padding-top:110px;text-align:center}
+  .contacto{border-top:1px solid var(--border);padding-top:68px;text-align:center}
   .contacto-frase{
     font-family:var(--serif);font-weight:300;
     font-size:clamp(1.5rem,3.6vw,2.4rem);line-height:1.3;
@@ -271,11 +271,11 @@
   .contacto-datos a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
   /* ---------- Secciones ---------- */
-  section{padding:0 0 120px}
-  section.about{padding-top:110px;border-top:1px solid var(--border)}
+  section{padding:0 0 76px}
+  section.about{padding-top:66px;border-top:1px solid var(--border)}
   h2{
     font-size:.72rem;text-transform:uppercase;
-    letter-spacing:.24em;color:var(--dim);margin:0 0 44px;font-weight:500;
+    letter-spacing:.24em;color:var(--dim);margin:0 0 26px;font-weight:500;
   }
 
   /* ---------- Categorias ---------- */
@@ -352,8 +352,6 @@
     background:var(--surface);
     overflow:hidden;                 /* el zoom no se sale del cuadro */
   }
-  canvas.dissolve{position:absolute;inset:0;z-index:3;pointer-events:none}
-  canvas.dissolve.fija{position:fixed;z-index:10}
 
   /* Capa de la imagen: es la que hace zoom, no la tarjeta */
   .thumb{
@@ -507,15 +505,15 @@
 
   /* ---------- About ---------- */
   .about p{
-    max-width:58ch;color:var(--muted);margin:0 0 20px;
-    font-family:var(--serif);font-weight:300;font-size:1.15rem;line-height:1.7;
+    max-width:58ch;color:var(--muted);margin:0 0 14px;
+    font-family:var(--serif);font-weight:300;font-size:1.06rem;line-height:1.65;
   }
   .about strong{color:var(--text);font-weight:400}
 
   .about-sub{
     font-size:.72rem;text-transform:uppercase;
     letter-spacing:.24em;color:var(--dim);font-weight:500;
-    margin:48px 0 18px;
+    margin:30px 0 13px;
   }
   .tools{
     list-style:none;margin:0;padding:0;
@@ -528,6 +526,11 @@
     transition:color .25s,border-color .25s;
   }
   .tools li:hover{color:var(--accent);border-color:var(--accent-dim)}
+
+  /* Clientes e idiomas, uno al lado del otro */
+  .about-par{display:grid;grid-template-columns:1fr 1fr;gap:0 44px;align-items:start}
+  .about-par .about-sub{margin-top:30px}
+  @media (max-width:640px){ .about-par{grid-template-columns:1fr;gap:0} }
 
   footer{
     padding:44px 0;border-top:1px solid var(--border);
@@ -592,40 +595,149 @@
 # --------------------------------------------------------------------------
 #  Este bloque lo escribe el editor (editor.html). Se puede tocar a mano,
 #  pero no hace falta.
+#
+#  OJO: todo lo que hay abajo son PROYECTOS DE PRUEBA, con imagenes de
+#  relleno (img/proyectos/demo-*.svg). Estan solo para ver como queda la
+#  cuadricula y como se recorre la galeria. Borralos desde el editor
+#  cuando cargues el contenido de verdad, y borra tambien los archivos
+#  demo-*.svg de img/proyectos/.
 # --------------------------------------------------------------------------
 
 @cats branding, social, video, ia
 
-== Proyecto de branding
-image:
+== Identidad Grupo LYN
+image: img/proyectos/demo-01.svg
+media: img/proyectos/demo-02.svg
+media: img/proyectos/demo-03.svg
+media: img/proyectos/demo-04.svg
+media: img/proyectos/demo-05.svg
+media: img/proyectos/demo-06.svg
+tags: Branding, Logotipo, Papelería
+link:
+cat: branding
+Sistema de identidad completo para el grupo: logotipo, paleta, tipografía y todas las aplicaciones, de la papelería a las redes. El objetivo era una marca que funcionara igual en una factura que en un reel.
+
+== Supermotos EK
+image: img/proyectos/demo-02.svg
+media: img/proyectos/demo-07.svg
+media: img/proyectos/demo-08.svg
+media: img/proyectos/demo-09.svg
 tags: Branding, Identidad visual
 link:
 cat: branding
-Reemplazá este texto con la descripción del proyecto. Este bloque de ejemplo se borra desde el editor.
+Marca para la concesionaria: logotipo, señalética y piezas para el local. Proyecto de prueba.
 
+== Papelería corporativa
+image: img/proyectos/demo-03.svg
+media: img/proyectos/demo-10.svg
+media: img/proyectos/demo-11.svg
+tags: Branding, Editorial
+link:
+cat: branding
+Tarjetas, carpetas y hojas membretadas. Proyecto de prueba.
 
-== Campaña para redes
-image:
+== Rediseño de marca Clínica SoñaRes
+image: img/proyectos/demo-12.svg
+media: img/proyectos/demo-04.svg
+media: img/proyectos/demo-09.svg
+tags: Branding, Salud
+link:
+cat: branding
+Actualización de la identidad sin perder lo que la gente ya reconocía. Proyecto de prueba.
+
+== Manual de marca
+image: img/proyectos/demo-09.svg
+media: img/proyectos/demo-01.svg
+media: img/proyectos/demo-07.svg
+media: img/proyectos/demo-10.svg
+tags: Branding, Editorial
+link:
+cat: branding
+Documento con los usos correctos del logotipo, la paleta y la tipografía. Proyecto de prueba.
+
+== Etiquetas y packaging
+image: img/proyectos/demo-10.svg
+media: img/proyectos/demo-03.svg
+tags: Branding, Packaging
+link:
+cat: branding
+Etiquetas para una línea de productos. Proyecto de prueba.
+
+== Campaña de verano
+image: img/proyectos/demo-04.svg
+media: img/proyectos/demo-12.svg
+media: img/proyectos/demo-01.svg
+media: img/proyectos/demo-05.svg
 tags: Social Media, Campaña
 link:
 cat: social
-Reemplazá este texto con la descripción del proyecto.
+Línea de piezas para toda la temporada: posts, carruseles y stories, con una gráfica que se sostenía a lo largo de tres meses de publicaciones.
 
+== Contenido mensual Electric Cars
+image: img/proyectos/demo-05.svg
+media: img/proyectos/demo-06.svg
+media: img/proyectos/demo-07.svg
+tags: Social Media, Copywriting
+link:
+cat: social
+Grilla mensual completa: concepto, diseño y textos. Proyecto de prueba.
 
-== Reel editado
-image:
-tags: Video, Postproducción
+== Carruseles Clínica SoñaRes
+image: img/proyectos/demo-06.svg
+media: img/proyectos/demo-08.svg
+tags: Social Media, Salud
+link:
+cat: social
+Piezas educativas para redes, con lenguaje claro. Proyecto de prueba.
+
+== Reels Supermotos
+image: img/proyectos/demo-07.svg
+media: img/proyectos/demo-09.svg
+media: img/proyectos/demo-10.svg
+media: img/proyectos/demo-11.svg
+tags: Video, Reels, Postproducción
 link:
 cat: video
-Reemplazá este texto con la descripción del proyecto.
+Serie de reels para lanzamiento: guion visual, edición, ritmo y musicalización. Proyecto de prueba.
 
+== Motion para Synapse Agents
+image: img/proyectos/demo-08.svg
+media: img/proyectos/demo-12.svg
+media: img/proyectos/demo-02.svg
+tags: Video, Motion Graphics
+link:
+cat: video
+Animación de marca y placas para video. Proyecto de prueba.
 
-== Contenido con IA
-image:
-tags: IA, Dirección visual
+== Retratos generados con IA
+image: img/proyectos/demo-09.svg
+media: img/proyectos/demo-01.svg
+media: img/proyectos/demo-03.svg
+media: img/proyectos/demo-04.svg
+media: img/proyectos/demo-11.svg
+tags: IA, Dirección visual, Prompt
 link:
 cat: ia
-Reemplazá este texto con la descripción del proyecto.
+Serie de imágenes generadas y retocadas con inteligencia artificial, con una dirección visual definida de antemano para que todas las piezas se vieran de la misma familia.
+
+== Video con IA para campaña
+image: img/proyectos/demo-10.svg
+media: img/proyectos/demo-05.svg
+media: img/proyectos/demo-12.svg
+tags: IA, Video
+link:
+cat: ia
+Generación y edición audiovisual con IA. Proyecto de prueba.
+
+== Piezas de producto con IA
+image: img/proyectos/demo-11.svg
+media: img/proyectos/demo-02.svg
+media: img/proyectos/demo-06.svg
+tags: IA, Producto
+link:
+cat: ia
+Fotografía de producto simulada con IA y retocada. Proyecto de prueba.
+
 </script>
 
 <!-- Redes y contacto. Cambiá los links por los de Daniela. -->
@@ -767,20 +879,26 @@ Reemplazá este texto con la descripción del proyecto.
       </li>
     </ul>
 
-    <h3 class="about-sub">Clientes</h3>
-    <ul class="tools">
-      <li>Grupo LYN</li>
-      <li>Supermotos EK</li>
-      <li>Electric Cars</li>
-      <li>Synapse Agents</li>
-      <li>Clínica SoñaRes</li>
-    </ul>
-
-    <h3 class="about-sub">Idiomas</h3>
-    <ul class="tools">
-      <li>Español — nativo</li>
-      <li>Inglés — intermedio</li>
-    </ul>
+    <!-- Clientes e idiomas van a la par: ocupan menos alto -->
+    <div class="about-par">
+      <div>
+        <h3 class="about-sub">Clientes</h3>
+        <ul class="tools">
+          <li>Grupo LYN</li>
+          <li>Supermotos EK</li>
+          <li>Electric Cars</li>
+          <li>Synapse Agents</li>
+          <li>Clínica SoñaRes</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="about-sub">Idiomas</h3>
+        <ul class="tools">
+          <li>Español — nativo</li>
+          <li>Inglés — intermedio</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1061,109 +1179,17 @@ Reemplazá este texto con la descripción del proyecto.
       /* Las tarjetas ya no van en filas parejas (cada una ocupa lo
          suyo), asi que la ola sigue el orden de aparicion y se
          frena a los 8 escalones para no hacerse eterna. */
-      var demora = Math.min(i, 8) * 95;
+      var demora = Math.min(i, 8) * 85;
 
-      /* solo el movimiento: la aparicion la hace la mascara de pixeles */
+      /* Aparecen subiendo un poco desde abajo, con un fundido comun */
       card.animate(
-        [{ transform:'translateY(-34px)' },
-         { transform:'none' }],
+        [{ opacity:0, transform:'translateY(26px)' },
+         { opacity:1, transform:'none' }],
         { duration:620, delay:demora, easing:'cubic-bezier(.22,1,.36,1)', fill:'backwards' }
       );
-
-      disolver(card, demora);
     });
   }
 
-  /* --- Mascara de pixeles: tapa la tarjeta con el color del fondo
-         y va abriendo huecos, asi el contenido aparece pixel por
-         pixel siguiendo el mismo ruido del brillo de los bordes. --- */
-  var COLOR_FONDO = (getComputedStyle(document.documentElement)
-                      .getPropertyValue('--bg') || '#0a0e0c').trim();
-
-  /* `fijo` = cubre toda la pantalla (para el panel de detalle) en vez
-     de solo la caja del elemento. */
-  function disolver(card, demora, fijo){
-    if (quieto || document.hidden) return;
-
-    var CELL  = 5,
-        DUR   = 760,
-        BORDE = 0.14,    // franja difusa del frente de avance
-        RUIDO = 0.45;    // 0 = barrido recto de arriba a abajo, 1 = puro ruido
-    var cv  = document.createElement('canvas');
-    cv.className = 'dissolve' + (fijo ? ' fija' : '');
-    card.appendChild(cv);
-    var ctx = cv.getContext('2d');
-
-    /* ruido estable por celda: define cuando se apaga cada pixel */
-    function ruido(x, y, sal){
-      var n = Math.sin(x * 12.9898 + y * 78.233 + sal * 43.1) * 43758.5453;
-      return n - Math.floor(n);
-    }
-
-    var quitar = setTimeout(function(){ if (cv.parentNode) cv.remove(); }, demora + DUR + 2000);
-
-    /* Se tapa YA, antes de que empiece su turno en la ola: si no,
-       la tarjeta asomaria un instante y despues se cubriria. */
-    var r = card.getBoundingClientRect();
-    var w = fijo ? window.innerWidth  : Math.max(1, Math.round(r.width));
-    var h = fijo ? window.innerHeight : Math.max(1, Math.round(r.height));
-    cv.width = w; cv.height = h;
-
-    var cols = Math.ceil(w / CELL), rows = Math.ceil(h / CELL);
-    ctx.fillStyle = COLOR_FONDO;
-    ctx.fillRect(0, 0, w, h);
-
-    /* Se dibuja en un lienzo de 1 pixel por celda y se amplia sin
-       suavizado. A pantalla completa serian ~43.000 rectangulos por
-       cuadro; asi es una sola imagen escalada. */
-    var buf  = document.createElement('canvas');
-    buf.width = cols; buf.height = rows;
-    var bctx   = buf.getContext('2d');
-    var imagen = bctx.createImageData(cols, rows);
-    var datos  = imagen.data;
-
-    /* el color de fondo a RGB, una sola vez */
-    var hex = COLOR_FONDO.replace('#', '');
-    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-    var R = parseInt(hex.slice(0,2),16) || 10,
-        G = parseInt(hex.slice(2,4),16) || 14,
-        B = parseInt(hex.slice(4,6),16) || 12;
-
-    ctx.imageSmoothingEnabled = false;
-
-    setTimeout(function(){
-      var inicio = performance.now();
-
-      (function frame(now){
-        var t = Math.min(1, (now - inicio) / DUR);
-        var flick = Math.floor(now / 70);          // parpadeo, como el edge glow
-        var i = 0;
-
-        for (var cy = 0; cy < rows; cy++){
-          /* El umbral mezcla la altura con el ruido: el frente baja
-             de arriba hacia abajo, pero con el borde deshilachado. */
-          var altura = (cy / rows) * (1 - RUIDO);
-
-          for (var cx = 0; cx < cols; cx++, i += 4){
-            var n = altura + ruido(cx, cy, 0) * RUIDO;
-
-            datos[i] = R; datos[i+1] = G; datos[i+2] = B;
-
-            if (n < t)              datos[i+3] = 0;      // abierto: se ve el contenido
-            else if (n < t + BORDE) datos[i+3] = (0.35 + ruido(cx, cy, flick) * 0.4) * 255;
-            else                    datos[i+3] = 255;    // todavia tapado
-          }
-        }
-
-        bctx.putImageData(imagen, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        ctx.drawImage(buf, 0, 0, w, h);
-
-        if (t < 1) requestAnimationFrame(frame);
-        else { clearTimeout(quitar); cv.remove(); }
-      })(performance.now());
-    }, demora);
-  }
 
   /* ==========================================================
      Panel de detalle: se abre sobre la pagina, sin navegar.
@@ -1207,7 +1233,14 @@ Reemplazá este texto con la descripción del proyecto.
     document.body.style.overflow = 'hidden';
     abierto = true;
 
-    disolver(panelDet, 0, true);              // aparece con el ruido de pixeles
+    /* El panel aparece con un fundido y sube un poco desde abajo */
+    if (!quieto && panelDet.animate){
+      panelDet.animate(
+        [{ opacity:0, transform:'translateY(22px)' },
+         { opacity:1, transform:'none' }],
+        { duration:420, easing:'cubic-bezier(.22,1,.36,1)' }
+      );
+    }
 
     try { history.pushState({ detalle:true }, ''); } catch(e){}
   }

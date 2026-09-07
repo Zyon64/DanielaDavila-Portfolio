@@ -1,1 +1,1 @@
-CreateObject("WScript.Shell").Run """C:\Users\MXD\Documents\Portfolio\PUBLICADOR.bat""", 0, False
+CreateObject("WScript.Shell").Run """D:\Documents\DanielaDavila-Portfolio\PUBLICADOR.bat""", 0, False

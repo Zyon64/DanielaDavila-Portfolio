@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1000" width="1800" height="1000">
+  <rect width="1800" height="1000" fill="#7A6480"/>
+  <circle cx="1116" cy="360" r="468" fill="#F6F1E7" opacity=".22"/>
+  <circle cx="504" cy="700" r="306" fill="#F6F1E7" opacity=".16"/>
+  <rect x="144" y="120" width="540" height="80" fill="#F6F1E7" opacity=".3"/>
+  <text x="50%" y="52%" font-family="Georgia, serif" font-size="200"
+        fill="#F6F1E7" text-anchor="middle" opacity=".92">02</text>
+  <text x="50%" y="62%" font-family="Helvetica, Arial, sans-serif" font-size="52"
+        fill="#F6F1E7" text-anchor="middle" opacity=".65" letter-spacing="6">IMAGEN DE PRUEBA</text>
+</svg>
