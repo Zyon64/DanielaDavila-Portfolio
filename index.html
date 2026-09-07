@@ -33,6 +33,11 @@
     --accent-soft:#EFE7F0;
     --glow:rgba(122,100,128,.18);
 
+    /* --- Franja morada intensa --- */
+    --deep:#3D2A4D;
+    --deep-text:#EFE6EC;
+    --deep-accent:#E3B0D2;
+
     --serif:"Fraunces",Georgia,"Times New Roman",serif;
     --sans:"Inter","Segoe UI",system-ui,sans-serif;
   }
@@ -92,9 +97,15 @@
     .links a{padding:5px 9px;font-size:.71rem}
   }
 
-  /* ---------- Hero centrado ---------- */
-  header{padding:220px 0 140px}
-  .hero{text-align:center}
+  /* ---------- Hero centrado ----------
+     El hero queda "pegado" arriba mientras la franja morada sube por
+     encima con otro ritmo. El contenido se desvanece antes de que la
+     franja lo alcance, asi las letras nunca quedan cortadas.        */
+  header{
+    padding:220px 0 300px;
+    position:sticky;top:0;z-index:0;
+  }
+  .hero{text-align:center;will-change:opacity,transform}
   h1{
     font-family:var(--serif);
     font-size:clamp(3rem,8vw,6rem);line-height:1;margin:0 0 20px;
@@ -109,11 +120,84 @@
     font-size:clamp(1.05rem,2vw,1.32rem);line-height:1.65;
     color:var(--muted);max-width:46ch;margin:0 auto;
   }
-  @media (max-width:720px){ header{padding:170px 0 90px} }
-  @media (max-width:600px){ header{padding:150px 0 74px} }
+  @media (max-width:720px){ header{padding:170px 0 230px} }
+  @media (max-width:600px){ header{padding:150px 0 200px} }
+
+  /* ---------- Franja morada ----------
+     z-index por encima del hero: sube y lo cubre. Todo lo que viene
+     despues viaja con ella, sobre el mismo fondo crema.             */
+  .franja{
+    position:relative;z-index:2;
+    background:var(--deep);color:var(--deep-text);
+    padding:130px 0 140px;text-align:center;
+  }
+  .franja-marca{
+    font-family:var(--serif);font-weight:400;
+    font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-.01em;
+    margin:0 0 40px;color:#fff;
+  }
+  .franja-marca span{
+    color:var(--deep-accent);font-size:.5em;font-family:var(--sans);
+    font-weight:400;letter-spacing:.2em;text-transform:uppercase;
+    display:block;margin-top:12px;
+  }
+  .franja p{
+    max-width:60ch;margin:0 auto 22px;
+    font-size:1.02rem;line-height:1.8;color:var(--deep-text);
+  }
+  .franja p.franja-lema{
+    color:var(--deep-accent);font-weight:600;
+    font-size:.86rem;letter-spacing:.13em;text-transform:uppercase;
+    margin:52px auto 0;line-height:1.9;
+  }
+  @media (max-width:600px){ .franja{padding:90px 0 96px} }
+
+  /* Lo que sigue a la franja va sobre el crema y por encima del hero */
+  .tras-franja{position:relative;z-index:2;background:var(--bg)}
+
+  /* ---------- Banner con foto fija ----------
+     La foto no se mueve con el scroll: la pagina pasa por encima y
+     ella queda quieta, como un patron. El color de fondo se ve
+     mientras la imagen carga (o si todavia no la subiste).        */
+  .banner{
+    position:relative;
+    min-height:clamp(340px,54vh,520px);
+    display:flex;align-items:center;justify-content:center;
+    background-color:var(--accent-soft);
+    background-image:url("img/servicios.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;   /* <- lo que la deja quieta */
+    overflow:hidden;
+  }
+  /* Velo crema: la palabra se lee siempre, salga como salga la foto */
+  .banner::before{
+    content:"";position:absolute;inset:0;
+    background:rgba(246,241,231,.42);
+  }
+  .banner-titulo{
+    position:relative;z-index:1;margin:0;text-align:center;
+    font-family:var(--sans);font-weight:600;
+    font-size:clamp(2.6rem,9vw,6.5rem);line-height:1;
+    letter-spacing:-.02em;text-transform:uppercase;
+    color:var(--deep);
+  }
+  /* La barrita de color debajo, como en la referencia */
+  .banner-titulo::after{
+    content:"";display:block;
+    width:clamp(70px,14vw,140px);height:clamp(7px,1.1vw,12px);
+    background:var(--deep-accent);
+    margin:.28em 0 0 12%;
+  }
+  /* En tactil `fixed` no funciona bien (iOS lo ignora o salta),
+     asi que ahi la foto se comporta normal. */
+  @media (max-width:900px){
+    .banner{background-attachment:scroll}
+  }
 
   /* ---------- Servicios ---------- */
-  .servicios{border-top:1px solid var(--border);padding-top:110px}
+  .servicios{padding-top:96px}
   .serv-grid{
     display:grid;grid-template-columns:repeat(2,1fr);
     gap:52px 44px;
@@ -207,7 +291,6 @@
   @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr);gap:36px 24px} }
   @media (max-width:600px){
     .grid{grid-template-columns:1fr}
-    header{padding:130px 0 80px}
   }
 
   .card{
@@ -470,6 +553,31 @@ Reemplazá este texto con la descripción del proyecto.
   </div>
 </header>
 
+<!-- Franja morada: sube por encima del hero mientras se scrollea -->
+<section class="franja">
+  <div class="wrap">
+    <p class="franja-marca">
+      Daniela Dávila
+      <span>Diseño &amp; Contenido</span>
+    </p>
+    <p>
+      Diseñadora gráfica y creadora de contenido digital, trabajando con
+      marcas desde 2011.
+    </p>
+    <p>
+      Construyo la identidad de una marca y después la sostengo día a día:
+      branding, piezas para redes, campañas publicitarias, video y contenido
+      generado con inteligencia artificial. Llevo marcas de sectores muy
+      distintos al mismo tiempo.
+    </p>
+    <p class="franja-lema">
+      Una marca bien diseñada se entiende sin explicaciones
+    </p>
+  </div>
+</section>
+
+<div class="tras-franja">
+
 <section id="trabajos">
   <div class="wrap">
     <h2>Trabajos</h2>
@@ -479,9 +587,13 @@ Reemplazá este texto con la descripción del proyecto.
   </div>
 </section>
 
-<section id="servicios" class="servicios">
+
+<!-- Banner: la foto queda fija y la pagina pasa por encima -->
+<div class="banner" id="servicios">
+  <h2 class="banner-titulo">Servicios</h2>
+</div>
+<section class="servicios">
   <div class="wrap">
-    <h2>Servicios</h2>
     <div class="serv-grid">
       <div class="serv">
         <h3>Diseño gráfico</h3>
@@ -619,6 +731,7 @@ Reemplazá este texto con la descripción del proyecto.
 <footer>
   <div class="wrap">© 2026 Daniela Dávila</div>
 </footer>
+</div><!-- /tras-franja -->
 
 
 <script>
@@ -1412,5 +1525,65 @@ Reemplazá este texto con la descripción del proyecto.
 })();
 </script>
 
+<script>
+/* ---------------------------------------------------------
+   El hero queda pegado arriba y la franja morada sube por
+   encima. Para que las letras no queden cortadas por el
+   borde de la franja, el contenido del hero se desvanece y
+   sube un poco antes de que la franja lo alcance.
+
+   Se mide en cada cuadro en vez de escuchar el evento de
+   scroll: asi funciona igual con scroll suave, con la rueda,
+   en tactil y cuando el navegador agrupa los eventos.
+   --------------------------------------------------------- */
+(function(){
+  var hero   = document.querySelector('.hero');
+  var franja = document.querySelector('.franja');
+  if (!hero || !franja) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var COLCHON = 40;   // px que la franja queda por debajo cuando ya se apago
+  var MINIMO  = 120;  // recorrido minimo del fundido
+
+  var ultimo = -1;
+  var ancho  = -1;
+  var margen = 240;
+
+  /* El recorrido del fundido sale del hueco que hay entre el texto y la
+     franja cuando la pagina esta arriba del todo — o sea, del padding de
+     abajo del hero. Asi el hero arranca siempre al 100%, tanto en
+     escritorio (hueco grande) como en el telefono (hueco chico). */
+  function medirMargen(){
+    var hueco = parseFloat(getComputedStyle(hero.closest('header')).paddingBottom) || 240;
+    margen = Math.max(MINIMO, hueco - COLCHON);
+  }
+
+  function cuadro(){
+    requestAnimationFrame(cuadro);
+
+    /* Nada que hacer si nada se movio desde el cuadro anterior */
+    var y = window.pageYOffset;
+    var w = window.innerWidth;
+    if (y === ultimo && w === ancho) return;
+    if (w !== ancho){ ancho = w; medirMargen(); }
+    ultimo = y;
+
+    /* Se mide contra el borde de abajo del texto, no contra su centro:
+       asi el hero termina de apagarse ANTES de que la franja lo toque. */
+    var borde = franja.getBoundingClientRect().top;
+    var abajo = hero.getBoundingClientRect().bottom;
+
+    var p = (borde - abajo - COLCHON) / margen;   // 1 = lejos, 0 = encima
+    if (p > 1) p = 1;
+    if (p < 0) p = 0;
+
+    hero.style.opacity   = p;
+    hero.style.transform = 'translateY(' + ((1 - p) * -40) + 'px)';
+  }
+
+  requestAnimationFrame(cuadro);
+})();
+</script>
 </body>
 </html>
