@@ -157,33 +157,60 @@
 
   /* ---------- Banner con foto fija ----------
      La foto no se mueve con el scroll: la pagina pasa por encima y
-     ella queda quieta, como un patron. El color de fondo se ve
-     mientras la imagen carga (o si todavia no la subiste).        */
+     ella queda quieta, como un patron.
+
+     La palabra se mezcla en negativo con lo que tenga detras, asi se
+     lee sobre cualquier zona de la foto. Para que esa inversion no
+     saque colores ajenos a la paleta (el negativo del lila da verde),
+     la foto va en escala de grises con un velo crema encima.        */
   .banner{
     position:relative;
+    isolation:isolate;             /* la mezcla no se escapa de acá */
     min-height:clamp(340px,54vh,520px);
     display:flex;align-items:center;justify-content:center;
     background-color:var(--accent-soft);
-    background-image:url("img/servicios.jpg");
+    overflow:hidden;
+  }
+  /* Capa de la foto, en duotono morado oscuro.
+
+     El velo y el tinte van en la MISMA capa, debajo de la palabra: si
+     fueran capas aparte encima, lavarian la mezcla.
+
+     Por que oscura: la palabra se mezcla en negativo, y el negativo de
+     un gris medio es otro gris medio — ahi las letras se pierden. Con
+     la foto llevada al extremo oscuro, el negativo siempre sale claro
+     y la palabra se lee entera. De paso el duotono la deja en la
+     paleta, en vez del verde que da invertir el lila.                */
+  .banner::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(30,20,40,.58),rgba(30,20,40,.58)),  /* oscurece */
+      linear-gradient(var(--accent),var(--accent)),            /* tinte morado */
+      url("img/servicios.png");
+    background-blend-mode:multiply, color, normal;
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
     background-attachment:fixed;   /* <- lo que la deja quieta */
-    overflow:hidden;
-  }
-  /* Velo crema: la palabra se lee siempre, salga como salga la foto */
-  .banner::before{
-    content:"";position:absolute;inset:0;
-    background:rgba(246,241,231,.42);
   }
   .banner-titulo{
-    position:relative;z-index:1;margin:0;text-align:center;
+    position:relative;margin:0;text-align:center;
     font-family:var(--sans);font-weight:600;
     font-size:clamp(2.6rem,9vw,6.5rem);line-height:1;
     letter-spacing:-.02em;text-transform:uppercase;
-    color:var(--deep);
   }
-  /* La barrita de color debajo, como en la referencia */
+  /* Sin soporte de mezcla: morado profundo, que sobre el velo se lee */
+  .banner-palabra{color:var(--deep)}
+
+  /* Con mezcla en negativo la palabra invierte lo que tenga detras,
+     asi se lee igual sobre una zona clara, oscura o revuelta. */
+  @supports (mix-blend-mode:difference){
+    .banner-palabra{
+      color:#fff;
+      mix-blend-mode:difference;
+    }
+  }
+  /* La barrita queda fuera de la mezcla: conserva el color de la marca */
   .banner-titulo::after{
     content:"";display:block;
     width:clamp(70px,14vw,140px);height:clamp(7px,1.1vw,12px);
@@ -193,7 +220,7 @@
   /* En tactil `fixed` no funciona bien (iOS lo ignora o salta),
      asi que ahi la foto se comporta normal. */
   @media (max-width:900px){
-    .banner{background-attachment:scroll}
+    .banner::before{background-attachment:scroll}
   }
 
   /* ---------- Servicios ---------- */
@@ -590,7 +617,7 @@ Reemplazá este texto con la descripción del proyecto.
 
 <!-- Banner: la foto queda fija y la pagina pasa por encima -->
 <div class="banner" id="servicios">
-  <h2 class="banner-titulo">Servicios</h2>
+  <h2 class="banner-titulo"><span class="banner-palabra">Servicios</span></h2>
 </div>
 <section class="servicios">
   <div class="wrap">
