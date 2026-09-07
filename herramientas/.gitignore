@@ -1,0 +1,2 @@
+# Los ejecutables no se suben al repositorio: pesan demasiado.
+*.exe

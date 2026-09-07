@@ -34,10 +34,29 @@ $BANDEJA = Join-Path $PSScriptRoot 'subir'
 $ESTADO  = Join-Path $BANDEJA '_estado.txt'
 $TOPE_MB = 45
 
-$FFMPEG  = 'C:\Users\MXD\Documents\ffmpeg-20190701-e51cc7e-win64-static\bin\ffmpeg.exe'
-$FFPROBE = 'C:\Users\MXD\Documents\ffmpeg-20190701-e51cc7e-win64-static\bin\ffprobe.exe'
-if (-not (Test-Path $FFMPEG))  { $FFMPEG  = 'ffmpeg' }
-if (-not (Test-Path $FFPROBE)) { $FFPROBE = 'ffprobe' }
+# ---------------------------------------------------------------------
+#  ffmpeg: optimiza los videos antes de subirlos.
+#  Se busca en varios lugares. El primero es una carpeta dentro del
+#  proyecto: ahi se puede dejar la version portable de ffmpeg sin
+#  instalar nada ni pedir permisos de administrador.
+#  Si no aparece en ninguno, los videos se suben tal cual.
+# ---------------------------------------------------------------------
+function BuscarHerramienta($nombre){
+    $candidatos = @(
+        (Join-Path $PSScriptRoot "herramientas\$nombre.exe"),
+        (Join-Path $PSScriptRoot "herramientas\bin\$nombre.exe"),
+        "$env:LOCALAPPDATA\Microsoft\WinGet\Links\$nombre.exe",
+        "C:\ffmpeg\bin\$nombre.exe"
+    )
+    foreach ($c in $candidatos){ if (Test-Path $c) { return $c } }
+    $enPath = Get-Command $nombre -ErrorAction SilentlyContinue
+    if ($enPath) { return $enPath.Source }
+    return $null
+}
+
+$FFMPEG  = BuscarHerramienta 'ffmpeg'
+$FFPROBE = BuscarHerramienta 'ffprobe'
+$HAY_FFMPEG = ($FFMPEG -ne $null -and $FFPROBE -ne $null)
 
 function Log($t){ Write-Host ("[{0}] {1}" -f (Get-Date -Format HH:mm:ss), $t) }
 
@@ -52,6 +71,12 @@ function LimpiarEstado(){ if (Test-Path $ESTADO) { Remove-Item $ESTADO -Force -E
 #  Optimizar: 720p, tope de 2 Mbps y el indice al principio del archivo
 # ---------------------------------------------------------------------
 function Optimizar($ruta, $nombre, $i, $total){
+    # Sin ffmpeg no se puede optimizar: el video se sube tal cual.
+    if (-not $HAY_FFMPEG){
+        Log "No encontre ffmpeg: subo $nombre sin optimizar."
+        return $ruta
+    }
+
     # OJO: el archivo optimizado tiene que llamarse IGUAL que el original,
     # porque `gh release upload` nombra el asset segun el archivo del disco.
     # Por eso va a una subcarpeta y no a "<nombre>.opt.mp4".

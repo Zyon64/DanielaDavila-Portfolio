@@ -1,0 +1,23 @@
+FFMPEG (opcional)
+=================
+
+Sirve para achicar los videos antes de subirlos: los pasa a 720p y les
+deja el indice al principio, asi arrancan rapido en la pagina.
+
+SIN esto el publicador igual funciona: sube los videos tal cual, solo
+que pesan mas y tardan mas en cargar.
+
+Como ponerlo (no hace falta ser administrador)
+----------------------------------------------
+1. Entra a  https://www.gyan.dev/ffmpeg/builds/
+2. Baja "ffmpeg-release-essentials.zip"
+3. Descomprimilo donde sea.
+4. Adentro, en la carpeta "bin", vas a encontrar ffmpeg.exe y
+   ffprobe.exe. Copia esos DOS archivos acá, en esta carpeta.
+
+Deberia quedar asi:
+
+   herramientas\ffmpeg.exe
+   herramientas\ffprobe.exe
+
+Listo. El publicador los encuentra solo la proxima vez que arranque.

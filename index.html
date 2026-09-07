@@ -434,18 +434,23 @@
     position:fixed;inset:0;z-index:95;
     background:var(--bg);
     overflow-y:auto;overscroll-behavior:contain;
-    padding:112px 0 100px;
+    padding:96px 0 100px;
   }
   .detalle[hidden]{display:none}
 
+  /* Queda pegado arriba: se puede volver desde cualquier punto de la
+     galeria sin tener que subir. Lleva fondo propio porque las fotos
+     le pasan por debajo. */
   .volver{
+    position:sticky;top:0;z-index:4;
+    display:inline-flex;align-items:center;
     font-size:.82rem;color:var(--muted);
-    background:none;border:none;
-    padding:0;cursor:pointer;margin-bottom:34px;
-    transition:color .25s;
+    background:var(--bg);border:1px solid var(--border);border-radius:100px;
+    padding:9px 20px;cursor:pointer;margin-bottom:30px;
+    transition:color .25s,border-color .25s,background .25s;
   }
   .volver::before{content:"\2190\00a0\00a0"}
-  .volver:hover{color:var(--accent)}
+  .volver:hover{color:var(--accent);border-color:var(--accent-dim)}
 
   .detalle-cols{
     display:grid;
@@ -455,13 +460,15 @@
   }
   .detalle-info{
     position:sticky;
-    top:112px;                       /* deja libre la barra de arriba */
+    top:66px;              /* deja pasar el boton Volver, que va pegado arriba */
     align-self:start;
   }
   @media (max-width:860px){
     .detalle-cols{grid-template-columns:1fr;gap:36px}
     .detalle-info{position:static}
   }
+  /* La barra se apila en dos lineas y crece: el panel arranca mas abajo */
+  @media (max-width:720px){ .detalle{padding-top:124px} }
 
   .detalle-titulo{
     font-family:var(--serif);font-weight:300;
@@ -595,15 +602,9 @@
 # --------------------------------------------------------------------------
 #  Este bloque lo escribe el editor (editor.html). Se puede tocar a mano,
 #  pero no hace falta.
-#
-#  OJO: todo lo que hay abajo son PROYECTOS DE PRUEBA, con imagenes de
-#  relleno (img/proyectos/demo-*.svg). Estan solo para ver como queda la
-#  cuadricula y como se recorre la galeria. Borralos desde el editor
-#  cuando cargues el contenido de verdad, y borra tambien los archivos
-#  demo-*.svg de img/proyectos/.
 # --------------------------------------------------------------------------
 
-@cats branding, social, video, ia
+@cats branding, social, video, ia, redes sociales
 
 == Identidad Grupo LYN
 image: img/proyectos/demo-01.svg
@@ -613,9 +614,10 @@ media: img/proyectos/demo-04.svg
 media: img/proyectos/demo-05.svg
 media: img/proyectos/demo-06.svg
 tags: Branding, Logotipo, Papelería
-link:
+link: 
 cat: branding
 Sistema de identidad completo para el grupo: logotipo, paleta, tipografía y todas las aplicaciones, de la papelería a las redes. El objetivo era una marca que funcionara igual en una factura que en un reel.
+
 
 == Supermotos EK
 image: img/proyectos/demo-02.svg
@@ -623,27 +625,30 @@ media: img/proyectos/demo-07.svg
 media: img/proyectos/demo-08.svg
 media: img/proyectos/demo-09.svg
 tags: Branding, Identidad visual
-link:
+link: 
 cat: branding
 Marca para la concesionaria: logotipo, señalética y piezas para el local. Proyecto de prueba.
+
 
 == Papelería corporativa
 image: img/proyectos/demo-03.svg
 media: img/proyectos/demo-10.svg
 media: img/proyectos/demo-11.svg
 tags: Branding, Editorial
-link:
+link: 
 cat: branding
 Tarjetas, carpetas y hojas membretadas. Proyecto de prueba.
+
 
 == Rediseño de marca Clínica SoñaRes
 image: img/proyectos/demo-12.svg
 media: img/proyectos/demo-04.svg
 media: img/proyectos/demo-09.svg
 tags: Branding, Salud
-link:
+link: 
 cat: branding
 Actualización de la identidad sin perder lo que la gente ya reconocía. Proyecto de prueba.
+
 
 == Manual de marca
 image: img/proyectos/demo-09.svg
@@ -651,17 +656,19 @@ media: img/proyectos/demo-01.svg
 media: img/proyectos/demo-07.svg
 media: img/proyectos/demo-10.svg
 tags: Branding, Editorial
-link:
+link: 
 cat: branding
 Documento con los usos correctos del logotipo, la paleta y la tipografía. Proyecto de prueba.
+
 
 == Etiquetas y packaging
 image: img/proyectos/demo-10.svg
 media: img/proyectos/demo-03.svg
 tags: Branding, Packaging
-link:
+link: 
 cat: branding
 Etiquetas para una línea de productos. Proyecto de prueba.
+
 
 == Campaña de verano
 image: img/proyectos/demo-04.svg
@@ -669,26 +676,29 @@ media: img/proyectos/demo-12.svg
 media: img/proyectos/demo-01.svg
 media: img/proyectos/demo-05.svg
 tags: Social Media, Campaña
-link:
+link: 
 cat: social
 Línea de piezas para toda la temporada: posts, carruseles y stories, con una gráfica que se sostenía a lo largo de tres meses de publicaciones.
+
 
 == Contenido mensual Electric Cars
 image: img/proyectos/demo-05.svg
 media: img/proyectos/demo-06.svg
 media: img/proyectos/demo-07.svg
 tags: Social Media, Copywriting
-link:
+link: 
 cat: social
 Grilla mensual completa: concepto, diseño y textos. Proyecto de prueba.
+
 
 == Carruseles Clínica SoñaRes
 image: img/proyectos/demo-06.svg
 media: img/proyectos/demo-08.svg
 tags: Social Media, Salud
-link:
+link: 
 cat: social
 Piezas educativas para redes, con lenguaje claro. Proyecto de prueba.
+
 
 == Reels Supermotos
 image: img/proyectos/demo-07.svg
@@ -696,18 +706,20 @@ media: img/proyectos/demo-09.svg
 media: img/proyectos/demo-10.svg
 media: img/proyectos/demo-11.svg
 tags: Video, Reels, Postproducción
-link:
+link: 
 cat: video
 Serie de reels para lanzamiento: guion visual, edición, ritmo y musicalización. Proyecto de prueba.
+
 
 == Motion para Synapse Agents
 image: img/proyectos/demo-08.svg
 media: img/proyectos/demo-12.svg
 media: img/proyectos/demo-02.svg
 tags: Video, Motion Graphics
-link:
+link: 
 cat: video
 Animación de marca y placas para video. Proyecto de prueba.
+
 
 == Retratos generados con IA
 image: img/proyectos/demo-09.svg
@@ -716,27 +728,38 @@ media: img/proyectos/demo-03.svg
 media: img/proyectos/demo-04.svg
 media: img/proyectos/demo-11.svg
 tags: IA, Dirección visual, Prompt
-link:
+link: 
 cat: ia
 Serie de imágenes generadas y retocadas con inteligencia artificial, con una dirección visual definida de antemano para que todas las piezas se vieran de la misma familia.
+
 
 == Video con IA para campaña
 image: img/proyectos/demo-10.svg
 media: img/proyectos/demo-05.svg
 media: img/proyectos/demo-12.svg
 tags: IA, Video
-link:
+link: 
 cat: ia
 Generación y edición audiovisual con IA. Proyecto de prueba.
+
 
 == Piezas de producto con IA
 image: img/proyectos/demo-11.svg
 media: img/proyectos/demo-02.svg
 media: img/proyectos/demo-06.svg
 tags: IA, Producto
-link:
+link: 
 cat: ia
 Fotografía de producto simulada con IA y retocada. Proyecto de prueba.
+
+
+== test
+image: img/chatgpt-image-6-sept-2026-19_32_59.png
+tags: 
+link: 
+cat: redes sociales
+sdasdasadad
+
 
 </script>
 
