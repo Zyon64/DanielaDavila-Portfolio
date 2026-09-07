@@ -9,6 +9,16 @@ $ErrorActionPreference = 'Continue'
 Set-Location $PSScriptRoot
 
 # ---------------------------------------------------------------------
+#  Git nunca debe quedarse esperando que alguien escriba algo.
+#  Cuando esto corre en segundo plano no hay ventana donde escribir:
+#  si git pide usuario y contraseña, el proceso se queda colgado o se
+#  cae sin dejar rastro. Asi falla rapido y podemos avisar.
+#  La primera vez hay que abrir PUBLICADOR.bat a mano, con ventana
+#  visible, para completar el login de GitHub una sola vez.
+# ---------------------------------------------------------------------
+$env:GIT_TERMINAL_PROMPT = '0'
+
+# ---------------------------------------------------------------------
 #  UN SOLO PUBLICADOR A LA VEZ.
 #  Si corren dos, se pisan: uno sube un archivo mientras el otro lo
 #  borra, y el video termina desapareciendo. Paso de verdad.
@@ -246,34 +256,56 @@ while ($true){
 
     # --- 1) LA PAGINA PRIMERO ---
     # Los textos y el orden se ven enseguida; los videos van llegando.
+    # Todo va dentro de un try: si algo revienta acá, el publicador
+    # tiene que avisar y seguir vivo, no desaparecer sin dejar rastro.
     Resultado 'trabajando' 'Publicando la pagina'
-    & git add . | Out-Null
-    $grandes0 = (& git diff --cached --name-only) |
-                Where-Object { Test-Path -LiteralPath $_ } |
-                Where-Object { (Get-Item -LiteralPath $_).Length -gt ($TOPE_MB * 1MB) }
-    if ($grandes0){
-        Log "Freno: archivos de mas de $TOPE_MB MB, no se sube nada."
-        $grandes0 | ForEach-Object { Write-Host "   $_" }
-        & git reset -q
-        Resultado 'error' ("Hay archivos de mas de $TOPE_MB MB: " + (($grandes0 | ForEach-Object { Split-Path $_ -Leaf }) -join ', '))
-    } else {
-        & git diff --cached --quiet
-        if ($LASTEXITCODE -ne 0){
-            Log 'Publicando la pagina...'
-            & git commit -q -m 'Actualizacion del portafolio'
-            & git push -q
-            if ($LASTEXITCODE -eq 0){
-                Log 'Pagina publicada. Ahora van los videos.'
-                Resultado 'ok' 'Pagina publicada'
-            } else {
-                Log 'Fallo el push. Reviso la conexion o las credenciales.'
-                Resultado 'error' 'No se pudo subir a GitHub. Revisa la conexion o el acceso al repositorio.'
-            }
+    try {
+        & git add . | Out-Null
+        $grandes0 = (& git diff --cached --name-only) |
+                    Where-Object { Test-Path -LiteralPath $_ } |
+                    Where-Object { (Get-Item -LiteralPath $_).Length -gt ($TOPE_MB * 1MB) }
+        if ($grandes0){
+            Log "Freno: archivos de mas de $TOPE_MB MB, no se sube nada."
+            $grandes0 | ForEach-Object { Write-Host "   $_" }
+            & git reset -q
+            Resultado 'error' ("Hay archivos de mas de $TOPE_MB MB: " + (($grandes0 | ForEach-Object { Split-Path $_ -Leaf }) -join ', '))
         } else {
-            # No habia nada que publicar: igual hay que avisar, si no el
-            # editor se queda esperando para siempre.
-            Resultado 'ok' 'No habia cambios para publicar'
+            & git diff --cached --quiet
+            if ($LASTEXITCODE -ne 0){
+                Log 'Publicando la pagina...'
+
+                $salidaCommit = (& git commit -m 'Actualizacion del portafolio' 2>&1) -join ' '
+                if ($LASTEXITCODE -ne 0){
+                    if ($salidaCommit -match 'identity|user\.email|user\.name'){
+                        Log 'Git no sabe quien sos.'
+                        Resultado 'error' 'Git no tiene configurado tu nombre y correo. Avisale a quien armo esto.'
+                    } else {
+                        Log "No se pudo confirmar el cambio: $salidaCommit"
+                        Resultado 'error' 'No se pudo preparar el cambio para publicar.'
+                    }
+                    & git reset -q
+                } else {
+                    $salidaPush = (& git push 2>&1) -join ' '
+                    if ($LASTEXITCODE -eq 0){
+                        Log 'Pagina publicada. Ahora van los videos.'
+                        Resultado 'ok' 'Pagina publicada'
+                    } elseif ($salidaPush -match 'Authentication|could not read|denied|403|terminal prompts disabled'){
+                        Log 'Falta el login de GitHub.'
+                        Resultado 'error' 'Falta iniciar sesion en GitHub. Abri PUBLICADOR.bat a mano una vez y completa el login.'
+                    } else {
+                        Log "Fallo el push: $salidaPush"
+                        Resultado 'error' 'No se pudo subir a GitHub. Revisa la conexion.'
+                    }
+                }
+            } else {
+                # No habia nada que publicar: igual hay que avisar, si no el
+                # editor se queda esperando para siempre.
+                Resultado 'ok' 'No habia cambios para publicar'
+            }
         }
+    } catch {
+        Log "Error inesperado: $($_.Exception.Message)"
+        Resultado 'error' ('Error inesperado: ' + $_.Exception.Message)
     }
     # --- 2) medios ---
     $total = $archivos.Count
