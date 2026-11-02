@@ -1885,16 +1885,21 @@ sdasdasadadasdsdsdsdsdsd
 </style>
 <script>
 /* ---------------------------------------------------------
-   Glitter de slime: puntitos que casi no titilan y se mueven con
-   inercia. Cada uno tiene una profundidad: los lejanos siguen poco
-   al scroll, los cercanos lo siguen casi entero. Al frenar el scroll
-   siguen un poquito mas en la misma direccion y se detienen despacio.
+   Glitter de slime: puntitos de colores morados y cumulos difusos
+   que se mueven con inercia larga, como en algo semilíquido. Cada
+   uno tiene su profundidad: los lejanos siguen poco al scroll, los
+   cercanos mas. Al frenar el scroll siguen un rato y se detienen
+   despacio.
    --------------------------------------------------------- */
 (function(){
   var zonas = document.querySelectorAll('header#inicio, .tras-franja');
   if (!zonas.length) return;
   var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var raiz = document.documentElement;
+
+  // Tonos (h) de la paleta: violetas, lilas, magentas y un azul violaceo
+  var TONOS = [262, 270, 278, 286, 295, 305, 315, 326, 238];
+  function tono(){ return TONOS[Math.floor(Math.random() * TONOS.length)] + (Math.random() * 14 - 7); }
 
   var campos = [];
   zonas.forEach(function(sec){
@@ -1903,27 +1908,66 @@ sdasdasadadasdsdsdsdsdsd
     c.className = 'brillos-lienzo';
     c.setAttribute('aria-hidden', 'true');
     sec.insertBefore(c, sec.firstChild);
-    campos.push({sec:sec, c:c, ctx:c.getContext('2d'), w:0, h:0, ps:[], visible:false, top:0});
+    campos.push({sec:sec, c:c, ctx:c.getContext('2d'), w:0, h:0, ps:[], nubes:[], visible:false, top:0});
   });
 
   function crear(campo){
-    var n = Math.round(Math.min(1200, Math.max(90, campo.w * campo.h / 2600)));
+    var area = campo.w * campo.h;
+    var n = Math.round(Math.min(2800, Math.max(160, area / 1100)));
     campo.ps = [];
     for (var i = 0; i < n; i++){
       var z = Math.random();                    // 0 lejos, 1 cerca
       campo.ps.push({
         x: Math.random() * campo.w,
         y: Math.random() * campo.h,
-        r: 0.5 + z * 0.9,                       // puntitos: 0.5 a 1.4 px
-        a: 0.18 + z * 0.37,
-        s: 0.12 + z * 0.42,                      // cuanto sigue al scroll
-        f: 0.972 + z * 0.02,                // friccion: cercanos se frenan mas lento
+        r: 0.5 + z * 0.9,
+        a: 0.12 + z * 0.3,
+        s: 0.12 + z * 0.42,
+        f: 0.972 + z * 0.02,
+        h: tono(),
+        l: Math.random(),                       // variacion de luminosidad
         vel: 0,
         fase: Math.random() * 6.28,
         ritmo: 0.0008 + Math.random() * 0.0035,
-        amp: 0.35 + Math.random() * 0.6
+        amp: 0.35 + Math.random() * 0.6,
+        col: ''
       });
     }
+    // cumulos difusos: manchas grandes y muy suaves
+    var m = Math.round(Math.min(60, Math.max(4, area / 90000)));
+    campo.nubes = [];
+    for (var j = 0; j < m; j++){
+      var zn = Math.random();
+      campo.nubes.push({
+        x: Math.random() * campo.w,
+        y: Math.random() * campo.h,
+        r: 70 + Math.random() * 130,
+        a: 0.08 + Math.random() * 0.1,
+        s: 0.06 + zn * 0.25,
+        f: 0.985 + zn * 0.012,                  // las nubes frenan aun mas lento
+        h: tono(),
+        l: Math.random(),
+        vel: 0,
+        fase: Math.random() * 6.28,
+        ritmo: 0.0002 + Math.random() * 0.0006,
+        col: ''
+      });
+    }
+    campo.tema = null;
+  }
+
+  // Los colores dependen del tema: claros sobre oscuro, profundos sobre crema
+  function pintarColores(campo, oscuro){
+    campo.ps.forEach(function(p){
+      var l = oscuro ? 62 + p.l * 26 : 34 + p.l * 20;
+      p.col = 'hsl(' + p.h.toFixed(0) + ',' + (oscuro ? 55 : 45) + '%,' + l.toFixed(0) + '%)';
+    });
+    campo.nubes.forEach(function(n){
+      var l = oscuro ? 45 + n.l * 25 : 48 + n.l * 18;
+      n.c0 = 'hsla(' + n.h.toFixed(0) + ',60%,' + l.toFixed(0) + '%,1)';
+      n.c1 = 'hsla(' + n.h.toFixed(0) + ',60%,' + l.toFixed(0) + '%,0)';
+    });
+    campo.tema = oscuro;
   }
 
   function medir(campo){
@@ -1938,8 +1982,18 @@ sdasdasadadasdsdsdsdsdsd
 
   var ultimoScroll = window.pageYOffset, ultimoT = 0;
 
+  // Inercia: la velocidad recibe un empujon del scroll y decae despacio
+  function mover(p, dScroll, dTop, dt, w, h, deriva){
+    var f = Math.pow(p.f, dt);
+    p.vel = p.vel * f + (-dScroll * p.s) * (1 - p.f);
+    p.y += p.vel * dt - dTop;
+    p.x += p.vel * deriva * Math.sin(p.fase) * dt;
+    p.y %= h; if (p.y < 0) p.y += h;
+    p.x %= w; if (p.x < 0) p.x += w;
+  }
+
   function cuadro(ahora){
-    var color = getComputedStyle(raiz).getPropertyValue('--accent').trim() || '#C8A6D4';
+    var oscuro = raiz.getAttribute('data-tema') === 'oscuro';
     var scroll = window.pageYOffset;
     var dScroll = scroll - ultimoScroll;
     ultimoScroll = scroll;
@@ -1948,26 +2002,38 @@ sdasdasadadasdsdsdsdsdsd
 
     campos.forEach(function(campo){
       var top = campo.sec.getBoundingClientRect().top;
-      var dTop = top - campo.top;               // cuanto se movio la zona en pantalla
+      var dTop = top - campo.top;
       campo.top = top;
       if (!campo.visible) return;
+      if (campo.tema !== oscuro) pintarColores(campo, oscuro);
 
       var ctx = campo.ctx, w = campo.w, h = campo.h;
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = color;
+
+      // cumulos difusos, al fondo
+      campo.nubes.forEach(function(n){
+        if (!quieto) mover(n, dScroll, dTop, dt, w, h, 0.35);
+        var r = n.r;
+        var latido = quieto ? 1 : 0.8 + 0.2 * Math.sin(ahora * n.ritmo + n.fase);
+        // tambien del otro lado, si la mancha cruza el borde y reaparece
+        [0, h, -h].forEach(function(o){
+          var cy = n.y + o;
+          if (cy + r < 0 || cy - r > h) return;
+          var g = ctx.createRadialGradient(n.x, cy, 0, n.x, cy, r);
+          g.addColorStop(0, n.c0);
+          g.addColorStop(1, n.c1);
+          ctx.globalAlpha = n.a * latido;
+          ctx.fillStyle = g;
+          ctx.fillRect(n.x - r, cy - r, r * 2, r * 2);
+        });
+      });
+
+      // puntitos
       campo.ps.forEach(function(p){
-        if (!quieto){
-          var f = Math.pow(p.f, dt);
-          // la velocidad persigue lo que se movio el scroll y, al frenar, decae
-          p.vel = p.vel * f + (-dScroll * p.s) * (1 - p.f);
-          // movimiento en pantalla = p.vel; se pasa a coordenadas de la zona
-          p.y += p.vel * dt - dTop;
-          p.x += p.vel * 0.2 * Math.sin(p.fase) * dt;   // leve deriva lateral, como en un fluido
-          p.x %= w; if (p.x < 0) p.x += w;
-          p.y %= h; if (p.y < 0) p.y += h;
-        }
+        if (!quieto) mover(p, dScroll, dTop, dt, w, h, 0.2);
         var tit = quieto ? 1 : 1 - p.amp * (0.5 + 0.5 * Math.sin(ahora * p.ritmo + p.fase));
         ctx.globalAlpha = p.a * tit;
+        ctx.fillStyle = p.col;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 6.2832);
         ctx.fill();
