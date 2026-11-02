@@ -1987,6 +1987,30 @@ sdasdasadadasdsdsdsdsdsd
 
   var ultimoScroll = window.pageYOffset, ultimoT = 0;
 
+  // Tope de scroll: al llegar arriba o abajo y seguir empujando, la pagina
+  // no se mueve, pero el glitter recibe un empujoncito suave.
+  var empuje = 0;
+  function enTope(dir){
+    var y = window.pageYOffset;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    return (dir < 0 && y <= 0) || (dir > 0 && y >= max - 1);
+  }
+  function empujar(delta){
+    empuje += Math.max(-4, Math.min(4, delta * 0.04));
+  }
+  window.addEventListener('wheel', function(e){
+    if (enTope(e.deltaY)) empujar(e.deltaY);
+  }, {passive:true});
+  var dedoY = null;
+  window.addEventListener('touchstart', function(e){ dedoY = e.touches[0].clientY; }, {passive:true});
+  window.addEventListener('touchmove', function(e){
+    if (dedoY === null) return;
+    var y = e.touches[0].clientY, d = dedoY - y;
+    dedoY = y;
+    if (enTope(d)) empujar(d * 2);
+  }, {passive:true});
+  window.addEventListener('touchend', function(){ dedoY = null; }, {passive:true});
+
   // Inercia: la velocidad recibe un empujon del scroll y decae despacio
   function mover(p, dScroll, dTop, dt, w, h, deriva){
     var f = Math.pow(p.f, dt);
@@ -2000,7 +2024,8 @@ sdasdasadadasdsdsdsdsdsd
   function cuadro(ahora){
     var oscuro = raiz.getAttribute('data-tema') === 'oscuro';
     var scroll = window.pageYOffset;
-    var dScroll = scroll - ultimoScroll;
+    var dScroll = scroll - ultimoScroll + empuje;
+    empuje = 0;
     ultimoScroll = scroll;
     var dt = ultimoT ? Math.min(ahora - ultimoT, 50) / 16.67 : 1;
     ultimoT = ahora;
