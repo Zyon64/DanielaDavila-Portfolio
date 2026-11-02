@@ -1907,7 +1907,7 @@ sdasdasadadasdsdsdsdsdsd
   });
 
   function crear(campo){
-    var n = Math.round(Math.min(700, Math.max(50, campo.w * campo.h / 4500)));
+    var n = Math.round(Math.min(1200, Math.max(90, campo.w * campo.h / 2600)));
     campo.ps = [];
     for (var i = 0; i < n; i++){
       var z = Math.random();                    // 0 lejos, 1 cerca
@@ -1915,12 +1915,13 @@ sdasdasadadasdsdsdsdsdsd
         x: Math.random() * campo.w,
         y: Math.random() * campo.h,
         r: 0.5 + z * 0.9,                       // puntitos: 0.5 a 1.4 px
-        a: 0.35 + z * 0.55,
-        s: 0.2 + z * 0.9,                       // cuanto sigue al scroll
-        f: 0.90 + z * 0.055,                // friccion: cercanos se frenan mas lento
+        a: 0.18 + z * 0.37,
+        s: 0.15 + z * 0.55,                      // cuanto sigue al scroll
+        f: 0.72 + z * 0.12,                 // friccion: cercanos se frenan mas lento
         vel: 0,
         fase: Math.random() * 6.28,
-        ritmo: 0.0004 + Math.random() * 0.0012
+        ritmo: 0.0008 + Math.random() * 0.0035,
+        amp: 0.35 + Math.random() * 0.6
       });
     }
   }
@@ -1963,7 +1964,7 @@ sdasdasadadasdsdsdsdsdsd
           p.y += p.vel * dt - dTop;
           p.y %= h; if (p.y < 0) p.y += h;
         }
-        var tit = quieto ? 1 : 0.8 + 0.2 * Math.sin(ahora * p.ritmo + p.fase);
+        var tit = quieto ? 1 : 1 - p.amp * (0.5 + 0.5 * Math.sin(ahora * p.ritmo + p.fase));
         ctx.globalAlpha = p.a * tit;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 6.2832);
