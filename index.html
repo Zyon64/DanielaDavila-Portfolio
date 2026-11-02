@@ -335,19 +335,24 @@
   }
 
   /* ---------- Contacto ---------- */
-  .contacto{border-top:1px solid var(--border);padding-top:68px;text-align:center}
+  /* Banda morada intensa, igual que la franja de arriba */
+  .contacto{
+    background:var(--deep);color:var(--deep-text);
+    padding:84px 0 92px;text-align:center;
+  }
+  .contacto h2{color:var(--deep-accent)}
   .contacto-frase{
     font-family:var(--serif);font-weight:300;
     font-size:clamp(1.5rem,3.6vw,2.4rem);line-height:1.3;
-    color:var(--text);margin:0 0 36px;letter-spacing:-.02em;
+    color:#fff;margin:0 0 36px;letter-spacing:-.02em;
   }
   .contacto-datos{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
   .contacto-datos a{
-    font-size:.9rem;color:var(--accent);text-decoration:none;
-    border:1px solid var(--accent-dim);border-radius:100px;
+    font-size:.9rem;color:var(--deep-accent);text-decoration:none;
+    border:1px solid rgba(227,176,210,.45);border-radius:100px;
     padding:11px 26px;transition:background .25s,color .25s;
   }
-  .contacto-datos a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .contacto-datos a:hover{background:var(--deep-accent);color:#2A1E36;border-color:var(--deep-accent)}
 
   /* ---------- Secciones ---------- */
   section{padding:0 0 76px}
@@ -1892,7 +1897,7 @@ sdasdasadadasdsdsdsdsdsd
    despacio.
    --------------------------------------------------------- */
 (function(){
-  var zonas = document.querySelectorAll('header#inicio, .tras-franja');
+  var zonas = document.querySelectorAll('header#inicio, .tras-franja, .franja, .contacto');
   if (!zonas.length) return;
   var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var raiz = document.documentElement;
@@ -1908,7 +1913,7 @@ sdasdasadadasdsdsdsdsdsd
     c.className = 'brillos-lienzo';
     c.setAttribute('aria-hidden', 'true');
     sec.insertBefore(c, sec.firstChild);
-    campos.push({sec:sec, c:c, ctx:c.getContext('2d'), w:0, h:0, ps:[], nubes:[], visible:false, top:0});
+    campos.push({sec:sec, c:c, deep:sec.matches('.franja, .contacto'), limpio:false, ctx:c.getContext('2d'), w:0, h:0, ps:[], nubes:[], visible:false, top:0});
   });
 
   function crear(campo){
@@ -2005,7 +2010,14 @@ sdasdasadadasdsdsdsdsdsd
       var dTop = top - campo.top;
       campo.top = top;
       if (!campo.visible) return;
-      if (campo.tema !== oscuro) pintarColores(campo, oscuro);
+      // Sobre el crema (modo claro) el glitter no se ve: solo vive en las zonas oscuras
+      var usaOscuro = campo.deep || oscuro;
+      if (!usaOscuro){
+        if (!campo.limpio){ campo.ctx.clearRect(0, 0, campo.w, campo.h); campo.limpio = true; }
+        return;
+      }
+      campo.limpio = false;
+      if (campo.tema !== usaOscuro) pintarColores(campo, usaOscuro);
 
       var ctx = campo.ctx, w = campo.w, h = campo.h;
       ctx.clearRect(0, 0, w, h);
