@@ -1874,6 +1874,131 @@ sdasdasadadasdsdsdsdsdsd
 })();
 </script>
 
+<style>
+  /* Brillitos de fondo: el canvas va detras del contenido */
+  .brillos{overflow:hidden}
+  .brillos:not(header){position:relative}   /* el header ya es sticky */
+  .brillos-lienzo{
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:0;
+  }
+</style>
+<script>
+/* ---------------------------------------------------------
+   Glitter de slime: puntitos que casi no titilan y se mueven con
+   inercia. Cada uno tiene una profundidad: los lejanos siguen poco
+   al scroll, los cercanos lo siguen casi entero. Al frenar el scroll
+   siguen un poquito mas en la misma direccion y se detienen despacio.
+   --------------------------------------------------------- */
+(function(){
+  var zonas = document.querySelectorAll('header#inicio, .tras-franja');
+  if (!zonas.length) return;
+  var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var raiz = document.documentElement;
+
+  var campos = [];
+  zonas.forEach(function(sec){
+    sec.classList.add('brillos');
+    var c = document.createElement('canvas');
+    c.className = 'brillos-lienzo';
+    c.setAttribute('aria-hidden', 'true');
+    sec.insertBefore(c, sec.firstChild);
+    campos.push({sec:sec, c:c, ctx:c.getContext('2d'), w:0, h:0, ps:[], visible:false, top:0});
+  });
+
+  function crear(campo){
+    var n = Math.round(Math.min(700, Math.max(50, campo.w * campo.h / 4500)));
+    campo.ps = [];
+    for (var i = 0; i < n; i++){
+      var z = Math.random();                    // 0 lejos, 1 cerca
+      campo.ps.push({
+        x: Math.random() * campo.w,
+        y: Math.random() * campo.h,
+        r: 0.5 + z * 0.9,                       // puntitos: 0.5 a 1.4 px
+        a: 0.35 + z * 0.55,
+        s: 0.2 + z * 0.9,                       // cuanto sigue al scroll
+        f: 0.90 + z * 0.055,                // friccion: cercanos se frenan mas lento
+        vel: 0,
+        fase: Math.random() * 6.28,
+        ritmo: 0.0004 + Math.random() * 0.0012
+      });
+    }
+  }
+
+  function medir(campo){
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    campo.w = campo.sec.clientWidth;
+    campo.h = campo.sec.clientHeight;
+    campo.c.width = campo.w * dpr;
+    campo.c.height = campo.h * dpr;
+    campo.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    crear(campo);
+  }
+
+  var ultimoScroll = window.pageYOffset, ultimoT = 0;
+
+  function cuadro(ahora){
+    var color = getComputedStyle(raiz).getPropertyValue('--accent').trim() || '#C8A6D4';
+    var scroll = window.pageYOffset;
+    var dScroll = scroll - ultimoScroll;
+    ultimoScroll = scroll;
+    var dt = ultimoT ? Math.min(ahora - ultimoT, 50) / 16.67 : 1;
+    ultimoT = ahora;
+
+    campos.forEach(function(campo){
+      var top = campo.sec.getBoundingClientRect().top;
+      var dTop = top - campo.top;               // cuanto se movio la zona en pantalla
+      campo.top = top;
+      if (!campo.visible) return;
+
+      var ctx = campo.ctx, w = campo.w, h = campo.h;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = color;
+      campo.ps.forEach(function(p){
+        if (!quieto){
+          var f = Math.pow(p.f, dt);
+          // la velocidad persigue lo que se movio el scroll y, al frenar, decae
+          p.vel = p.vel * f + (-dScroll * p.s) * (1 - f);
+          // movimiento en pantalla = p.vel; se pasa a coordenadas de la zona
+          p.y += p.vel * dt - dTop;
+          p.y %= h; if (p.y < 0) p.y += h;
+        }
+        var tit = quieto ? 1 : 0.8 + 0.2 * Math.sin(ahora * p.ritmo + p.fase);
+        ctx.globalAlpha = p.a * tit;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(cuadro);
+  }
+
+  campos.forEach(medir);
+  if ('ResizeObserver' in window){
+    var ro = new ResizeObserver(function(es){
+      es.forEach(function(e){
+        campos.forEach(function(c){ if (c.sec === e.target) medir(c); });
+      });
+    });
+    campos.forEach(function(c){ ro.observe(c.sec); });
+  } else {
+    window.addEventListener('resize', function(){ campos.forEach(medir); });
+  }
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        campos.forEach(function(c){ if (c.sec === e.target) c.visible = e.isIntersecting; });
+      });
+    });
+    campos.forEach(function(c){ io.observe(c.sec); });
+  } else {
+    campos.forEach(function(c){ c.visible = true; });
+  }
+  requestAnimationFrame(cuadro);
+})();
+</script>
+
 <script>
 /* ---------------------------------------------------------
    Boton de tema. El atributo ya lo puso el script del <head>;
