@@ -1916,8 +1916,8 @@ sdasdasadadasdsdsdsdsdsd
         y: Math.random() * campo.h,
         r: 0.5 + z * 0.9,                       // puntitos: 0.5 a 1.4 px
         a: 0.18 + z * 0.37,
-        s: 0.15 + z * 0.55,                      // cuanto sigue al scroll
-        f: 0.72 + z * 0.12,                 // friccion: cercanos se frenan mas lento
+        s: 0.12 + z * 0.42,                      // cuanto sigue al scroll
+        f: 0.972 + z * 0.02,                // friccion: cercanos se frenan mas lento
         vel: 0,
         fase: Math.random() * 6.28,
         ritmo: 0.0008 + Math.random() * 0.0035,
@@ -1959,9 +1959,11 @@ sdasdasadadasdsdsdsdsdsd
         if (!quieto){
           var f = Math.pow(p.f, dt);
           // la velocidad persigue lo que se movio el scroll y, al frenar, decae
-          p.vel = p.vel * f + (-dScroll * p.s) * (1 - f);
+          p.vel = p.vel * f + (-dScroll * p.s) * (1 - p.f);
           // movimiento en pantalla = p.vel; se pasa a coordenadas de la zona
           p.y += p.vel * dt - dTop;
+          p.x += p.vel * 0.2 * Math.sin(p.fase) * dt;   // leve deriva lateral, como en un fluido
+          p.x %= w; if (p.x < 0) p.x += w;
           p.y %= h; if (p.y < 0) p.y += h;
         }
         var tit = quieto ? 1 : 1 - p.amp * (0.5 + 0.5 * Math.sin(ahora * p.ritmo + p.fase));
