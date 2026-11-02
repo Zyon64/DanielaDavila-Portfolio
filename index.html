@@ -2010,9 +2010,11 @@ sdasdasadadasdsdsdsdsdsd
       var dTop = top - campo.top;
       campo.top = top;
       if (!campo.visible) return;
-      // Sobre el crema (modo claro) el glitter no se ve: solo vive en las zonas oscuras
-      var usaOscuro = campo.deep || oscuro;
-      if (!usaOscuro){
+      // Cada zona brilla en un solo modo: las moradas (franja y contacto) en
+      // modo claro, y el fondo oscuro del sitio en modo oscuro.
+      var activa = campo.deep ? !oscuro : oscuro;
+      var usaOscuro = true;   // en ambos casos el fondo es oscuro: puntos claros
+      if (!activa){
         if (!campo.limpio){ campo.ctx.clearRect(0, 0, campo.w, campo.h); campo.limpio = true; }
         return;
       }
